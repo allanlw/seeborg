@@ -1,7 +1,9 @@
-#include <stdio.h>
+#include <cstdio>
 
 #include "seeborg.h"
 #include "seeutil.h"
+
+using namespace std;
 
 int SeeBorg::LoadSettings(void)
 {

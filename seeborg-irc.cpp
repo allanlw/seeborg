@@ -8,15 +8,16 @@
 #endif				// _MSC_VER
 #endif				// __unix__
 
-#include <stdlib.h>
-#include <signal.h>
-#include <locale.h>
-#include <ctype.h>
+#include <cstdlib>
+#include <csignal>
+#include <clocale>
+#include <cctype>
 
 #include "seeborg.h"
 #include "seeborg-irc.h"
 #include "seeutil.h"
 
+using namespace std;
 
 extern "C" {
 #include "botnet/botnet.h"

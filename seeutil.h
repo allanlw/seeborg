@@ -8,11 +8,9 @@
 #include <vector>
 #include <cmath>
 
-using namespace std;
-
 inline float randFloat(float min, float max)
 {
-    float retval = (float) rand() / (float) RAND_MAX;
+    float retval = (float) std::rand() / (float) RAND_MAX;
     retval *= (max - min);
     retval += min;
     return retval;
@@ -23,15 +21,15 @@ inline int randInt(int min, int max)
     return (int) roundf(randFloat(min,max));
 }
 
-int tokenizeString(string &str, vector < string > &tokens);
-int splitString(string &str, vector < string > &tokens,
+int tokenizeString(std::string &str, std::vector < std::string > &tokens);
+int splitString(std::string &str, std::vector < std::string > &tokens,
                 const char *needle);
-string joinString(vector < string > &tokens);
-int lowerString(string &str);
+std::string joinString(std::vector < std::string > &tokens);
+int lowerString(std::string &str);
 int lowerString(char *str);
-int trimString(string &str);
+int trimString(std::string &str);
 
-int fReadStringLine(FILE *f, string &);
+int fReadStringLine(std::FILE *f, std::string &);
 
 // Arguments from string
 void CMA_TokenizeString(const char *str);

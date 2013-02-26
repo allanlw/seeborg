@@ -1,8 +1,10 @@
-#include <time.h>
-#include <locale.h>
+#include <ctime>
+#include <clocale>
 
 #include "seeborg.h"
 #include "seeutil.h"
+
+using namespace std;
 
 seeborg_t gSeeBorg;
 

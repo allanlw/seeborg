@@ -1,25 +1,23 @@
 #ifndef __SEEBORG_IRC_H__
 #define __SEEBORG_IRC_H__
 
-using namespace std;
-
 // Bot commands
 // ---------------------------------------------------------------------------
-string CMD_Shutup_f(class SeeBorg *self, const string command);
-string CMD_Wakeup_f(class SeeBorg *self, const string command);
+std::string CMD_Shutup_f(class SeeBorg *self, const std::string command);
+std::string CMD_Wakeup_f(class SeeBorg *self, const std::string command);
 
-string CMD_Replyrate_f(class SeeBorg *self, const string command);
-string CMD_Replynick_f(class SeeBorg *self, const string command);
-string CMD_Replyword_f(class SeeBorg *self, const string command);
+std::string CMD_Replyrate_f(class SeeBorg *self, const std::string command);
+std::string CMD_Replynick_f(class SeeBorg *self, const std::string command);
+std::string CMD_Replyword_f(class SeeBorg *self, const std::string command);
 
-string CMD_Join_f(class SeeBorg *self, const string command);
-string CMD_Part_f(class SeeBorg *self, const string command);
-string CMD_Quit_f(class SeeBorg *self, const string command);
-string CMD_Save_f(class SeeBorg *self, const string command);
-string CMD_Learning_f(class SeeBorg *self, const string command);
-string CMD_ircHelp_f(class SeeBorg *self, const string command);
+std::string CMD_Join_f(class SeeBorg *self, const std::string command);
+std::string CMD_Part_f(class SeeBorg *self, const std::string command);
+std::string CMD_Quit_f(class SeeBorg *self, const std::string command);
+std::string CMD_Save_f(class SeeBorg *self, const std::string command);
+std::string CMD_Learning_f(class SeeBorg *self, const std::string command);
+std::string CMD_ircHelp_f(class SeeBorg *self, const std::string command);
 
-string ircParseCommands(const string command, const char *who);
+std::string ircParseCommands(const std::string command, const char *who);
 
 static botcommand_t ircbotcmds[] = {
     {"help", "Show this command list", CMD_ircHelp_f},

@@ -1,6 +1,8 @@
-#include <ctype.h>
+#include <cctype>
 
 #include "seeutil.h"
+
+using namespace std;
 
 int tokenizeString(string &instr, vector < string > &outtokens)
 {
