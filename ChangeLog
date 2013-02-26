@@ -1,0 +1,15 @@
+SeeBorg ChangeLog
+-----------------
+
+17/06/2003: v0.5 beta
+  - Catch duplicate channels in config
+  - Makefile works now on mingw32 w/msys (and should on cygwin)
+  - Added Dev-C++ projects (visual-mingw will follow)
+  - Cleanup of source code, std namespace is now default
+  - Bugfix: Extra whitespace in front of realname (botnet's bug)
+  - New IRC trigger: !save - saves the dictionary and settings
+  - Configuration settings are now with commented descriptions
+  - If there are no owners, don't react to IRC triggers at all
+
+01/06/2003: v0.4 beta
+  - First public release

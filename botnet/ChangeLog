@@ -1,0 +1,224 @@
+                       The BotNet Historic
+                       Updated by Ze KiLleR
+
+                      Stable Version : 1.6.3
+                      Devel  Version : none
+                  Last Update : November, 26th 2001
+
+November, 26th: (Version 1.6.3)
+  - Fixed a bug in dcc send thread (using a freed stucture ;(( )
+
+November, 25th:
+  - Fixed bugs in DCC Send functions
+  - Added time out for accepting a dcc send
+  - Added new callback to dcc send, and change OnDCCxxClosed ones
+
+November, 14th:
+  - Added BN_PrintDebug, and BN_SetDebugLevel, so we can dynamically sets debug level
+
+October, 26th:
+  - Fixed a bug in whois info, which can now handle multiple answers in a single whois query
+
+October, 16th:
+  - Fixed a bug that may cause a seg fault when using /whois command
+  - Added away info in whois struct
+
+August, 31th 2001:
+  - Fixed a bug in configure/botnet-config.in
+
+August, 22th 2001:
+  - Fixed a bug in BN_SendPartMessage
+
+July, 28th 2001: (Version 1.6.2)
+  - Fixed a bug in parse message
+  - Added bahamut ircd support
+  - Added a new option in configure, to enable bahamut
+
+July, 26th 2001:
+  - Fixed a bug in open() function in dcc send (thanks to Maurizio Butti)
+
+March, 27th 2001:
+  - Fixed a bug in ACTION message (input and output)
+
+March, 26th 2001:
+  - Fixed a bug in pthread signal, that may cause a seg fault
+
+March, 6th 2001:
+  - Fixed a bug that causes a seg fault with some ircd (MAX_PARAMS is now defined to 20, instead of 10)
+
+February, 15th 2001: (Version 1.6.1)
+  - New option in configure : --enable-nonstd to enable non standard ircd compatibility
+  - Release
+
+January, 14th 2001:
+  - Fixed a bug that may cause a seg fault with some non standard ircd
+
+January, 13th 2001:
+  - Fixed parse message function for some non standard ircd that causes seg fault (#define NON_STANDARD in botnet.c)
+  - Fixed small memory leak when disconnecting/reconnecting
+  - Fixed wrong Tls Allocation in windows code
+
+January, 7th 2001:
+  - Added the BN_SendPartMessage function
+
+January, 4th 2001:
+  - Changed a memcpy to a memmove in botnet.c
+
+December, 18th 2000:
+  - Added a -D_REENTRANT to configure... using thread for a long time and have forgotten it ;(
+
+December, 6th 2000:
+  - Added CTCP query to channels, and optimized CTCP function
+
+October, 28th 2000: (Version 1.6.0)
+  - New stable release, nothing more :o)
+
+September, 24th 2000:
+  - Fixed possible buffer overflows with strcpy/sprintf/sscanf/strcat
+  - Fixed a problem with CTCP functions
+
+September, 11th 2000: (Version 1.5.3)
+  - Added a botnet-config script. Please use this to check version, flags, libs, and server capabilities in your projects (see otarie project's configure.in for an example of use of botnet-config)
+
+September, 6th 2000:
+  - Many changes in callbacks in order to get better performance with or without server mode, so pay attention to the new parameters of callbacks.
+    (many callbacks have now a Whom parameter that is YOUR nick, but is used in server mode, so don't bother with it if you're not using server capabilities)
+
+September, 5th 2000:
+  - Added a 'BOTNET-DEBUG' before every debug message (helps redirecting output to a file)
+
+August, 28th 2000:
+  - Remove ALL prefix of irc2 server in BN_ExtractUserName function (Use BN_ExtractExactUserName to keep prefixes)
+
+August, 15th 2000: (Version 1.5.2)
+  - Fixed a bug in botnet.h using SERVER define... can't work with this define ;('
+
+August, 9th 2000:
+  - Fixed a bug in SendWallopMessage function
+
+August, 2nd 2000: (Version 1.5.1)
+  - Fixed a nasty bug with configure script that produced an unusable library
+  - Added many callback in servers callbacks
+  - Fixed a possibility of buffer overflow
+  - Changed a little bit the callback structures for a better use in server mode
+
+July, 30th 2000: (Version 1.5.0)
+  - Fixed a bug with BSD compatibility, now compiles and runs under BSD
+
+July, 29th 2000:
+  - Fixed the use of strtok function (now using strtok_r, for thread safe use)
+  - Fixed a bug in the use of the gethostbyname function in BN_Connect
+  - Added a new example for making a server (leaf server)
+  - Restored WIN32 compatibility, using a define from config.h for semaphores
+
+July, 28th 2000:
+  - Added a new option to configure (--enable-server), to enable server being made with botnet
+  - Added new functions and callbacks for servers
+
+July, 27th 2000:
+  - Little change in example makefile to link with static lib from current archive
+  - Added a new option to configure (--enable-context), and contexts to botnet (helps for debug)
+  - Added a time out to the connection
+
+June, 12th 2000:
+  - Changed old Nick[20] to Nick[BN_NICKLENGTH], same for UserName and Addrs :o)
+
+June, 6th 2000 : (Version 1.4.3)
+  - Added BN_ExtractExactUserName function, that keeps ~ or ^ in username (for chat and send structures)
+  - Added libc_r in configure for BSD
+
+June, 4th 2000 : (Version 1.4.2)
+  - Changed OnFlood event to OnExcessFlood event (for a future use of OnFlood event for a user's flood on the lib)
+  - Added semaphores in output functions (when using ExcessFlood protection mechanism)
+  - Changed the ExcessFlood mechanism (no more sleeping, but using a queue for waiting messages)
+  - Use of priorities for messages in waiting state because of an excess flood
+
+May, 28th 2000 :
+  - Added UserName info on Chat & Send structures
+
+May, 21th 2000 : (Version 1.4.1)
+  - Added a time stamp to the messages arrival
+  - Restored WIN32 compatibility, which was broken with Yann Vernier's patch
+
+May, 16th 2000 :
+  - Bug fix in memory allocation
+  - Little optimisation
+
+April, 19th 2000 :
+  - Dcc request are now freed if there is no dcc callback
+  - libbotnet is now usable in a multi threaded application using multiple BNconnections - Thx to Yann Vernier for the patch (yann@cf4.euroseek.net)
+  - Little change in the OnList callback prototype
+
+April, 5th 2000 :
+  - Changed __linux__ to __unix__ for better compatibility
+
+April, 4th 2000 :
+  - Finaly found the lazy bug in recv message (due to irc server sending a simple "\r" msg)
+
+March, 27th 2000 :
+  - Library now uses configure script
+
+March, 21th 2000 :
+  - Added a new callback (OnModeIs)
+
+March, 10th 2000 :
+  - Added a new user callbacks (OnUserCallback1 2 3 and 4)
+
+March, 6th 2000 :
+  - Added a new call back for reply for a channel's ban list
+  - Bug fixed in dcc_send file (Jimmy Cederholm)
+
+February, 28th 2000 :
+  - Added BN_StripColor function.
+
+February, 27th 2000 :
+  - Windows portability finished
+  - Bug fixed in dcc chat, thanks to pthread again
+
+February, 22th 2000 :
+  - OnDCCChatIdle callback function added by Jimmy Cederholm (jimmy@cederholm.as)
+  - Fixed compatibility problems with win32
+
+February, 20th 2000 :
+  - Added DCC Send functions, thanks to Jimmy Cederholm (jimmy@cederholm.as)
+
+February, 16th 2000 :
+  - Many bug fixes in threads
+  - Old bug fixed in main loop, thanx to threads and MALLOC_CHECK_ again :)
+
+February, 14th 2000 :
+  - Changed Flags for BN_Connect and DCC (THREAD and PROCESS)
+  - Now using threads or process for connecting and dcc chat
+  - Windows (Visual C++) port completed
+
+February, 2nd 2000 :
+  - Minor bug fixes
+  - Added the OnWho event
+  - Fixed bug with the Count parameter for OnNames event
+
+January, 4th 2000 :
+  - No more ~ or ^ in nick from ExtractNick
+  - Memory bug fixed
+
+January, 3rd 2000 :
+  - Added the excess flood protection mechanism
+
+December, 25th 1999: (Merry Christmas :)
+  - Lots of bug fixes
+  - Fully rewritten into event-handling model
+
+December, 20th 1999 :
+  - Fixed a huge memory bug (thanks to the MALLOC_CHECK_ env :))
+
+December, 8th 1999 :
+  - Fixed a bug due to some irc server (not using \r\n, but only \n)
+  - Added DCC CHAT mode (some functions for an easy connection).
+
+November, 17th 1999 :
+  - Small bug fix in WaitForData function.
+  - Better example file.
+  - Added a useful function
+
+November, 15th 1999 :
+  - First release.
+  - Some mini bots could yet be programmed.

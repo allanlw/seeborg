@@ -1,0 +1,87 @@
+SeeBorg readme file
+-------------------
+SeeBorg: a C++ clone of PyBorg, the IRC chatbot written by Tom Morton.
+
+SeeBorg is a random phrase bot that will sit on IRC channel, learning words,
+and periodically (configurable) replying with something that doesn't make
+much sense at all, but sometimes it's at least funny.
+
+It can learn in any language, not just english, but for better character
+processing (like case conversion), you will need to set appropriately
+your system locale.
+
+It uses BotNet library written by Christophe CALMEJANE to connect and
+interact with IRC servers. The library is included in the tarball.
+
+To compile, read the Makefiles and make any changes required (you may
+probably want to change CFCPU to better value), then type `make' and fix
+the errors which will be displayed, if any. SeeBorg is in very early stage
+of development and probably won't work for you at all yet.
+
+After running make, you'll end up with two executables - seeborg-irc and
+seeborg-line, that is, the seeborg that communicates on IRC or linein.
+The linein is useful for offline chat with the bot and to test the
+modifications done to the dictionary.
+
+Without any parameters, seeborg-irc reads configuration from seeborg-irc.cfg
+located in current working directory. If it doesn't exist, it will create one
+and terminate, suggesting you to inspect the config file, that's a good idea.
+
+
+Config settings:
+----------------
+server         - server to connect to (default: none)
+serverport     - port of the server to connect to (default: 6667)
+nickname       - nickname (default: SeeBorg)
+username       - username (default: SeeBorg)
+realname       - realname (default: I am SeeBorg v0.5 beta)
+quitmessage    - quit message (default: ByeBye...)
+learning       - '1' if learning new words is enabled, '0' if disabled
+                 (default: 1)
+stealth        - Doesn't work yet, will enable/disable masking as a
+                 regular mIRC user
+joininvites    - Doesn't work yet, will enable/disable joining to channel
+                 invitations
+
+replyrate      - Bot's general reply rate, in percent (default: 1)
+replynick      - Bot's reply rate to his nickname, in percent (default: 33)
+replymagic     - Bot's reply rate to magic words set in 'magicwords',
+                 in percent (default: 33)
+autosaveperiod - Autosave period, in seconds (default: 600)
+channels       - Space separated channel list to autojoin on connect
+                 (default: #test #seeborg)
+magicwords     - Space separated magic word list to reply to according to
+                 replymagic value, useful if bot has alternative nicknames,
+                 like russian. (no default)
+owners         - Space separated bot owners' nickname list, the owner's
+                 hostname will be locked after each bot restart. (no default)
+
+
+Portability:
+------------
+It compiles succesfully with GCC v2.95.3, GCC v3.2, GCC v3.2.2 and MSVC v6.0.
+Tested succesfully on Linux 2.4.x, FreeBSD 4.6.2, mingw32 and Win32.
+
+I see no reason why it shouldn't compile and run on any other platform
+that is supported by botnet library and supports standard C++.
+
+If compiling under mingw32 and cygwin, you would want to comment out the 
+CFUSER=-ptrhead line and uncomment LDFLAGS line (one with -lwsock32)
+in the Makefiles.
+
+
+Credits and copyright:
+----------------------
+If you find this program entertaining, you might want to help me develop it.
+The TODO file contains a list of yet-to-be-done things/ideas.
+
+If you plan using BotNet, please download the original package, since this
+one is a cut-down version and tailored for SeeBorg, your mileage may vary.
+
+SeeBorg is (C) 2003 Eugene 'HMage' Bujak.
+BotNet is (C) Christophe CALMEJANE 'Ze KiLleR / SkyTech'
+
+This software is subject to the terms of the
+GNU General Public License (GPL) - see the accompanying
+'COPYING' file.
+
