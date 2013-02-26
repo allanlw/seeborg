@@ -13,6 +13,7 @@
 #include <clocale>
 #include <cctype>
 #include <fstream>
+#include <cstring>
 
 #include "seeborg.h"
 #include "seeborg-irc.h"

@@ -1,10 +1,8 @@
 #ifndef __SEEUTIL_H__
 #define __SEEUTIL_H__
 
-#include <cstdio>
-#include <cstdlib>
-#include <cstring>
 #include <string>
+#include <cstdlib>
 #include <vector>
 #include <cmath>
 

@@ -11,27 +11,29 @@ seeborg_t gSeeBorg;
 
 void PrintReply(string text)
 {
-    printf("<Seeborg> %s\n", text.c_str());
+    cout << "<Seeborg> " << text  << endl;
 }
 
 
 int main(int argc, char *argv[])
 {
     setlocale(LC_ALL, "");
-    printf("SeeBorg v" SEEBORGVERSIONSTRING
-           ", copyright (C) 2003 Eugene Bujak.\n\n");
+
+    cout << "SeeBorg v" SEEBORGVERSIONSTRING
+        <<", copyright (C) 2003 Eugene Bujak." << endl << endl;
+
     string body;
     srand(time(NULL));
 
-    printf("Loading dictionary...\n");
+    cout << "Loading dictionary..." << endl;
     gSeeBorg.LoadSettings();
 
 #ifndef PROFILE
-    printf
-    ("\nSeeBorg offline chat, learning disabled. Press CTRL-C to quit.\n\n");
+    cout << endl << "SeeBorg offline chat, learning disabled."
+         << " Press CTRL-C to quit." << endl << endl;
 
     while (1) {
-        printf("> ");
+        cout << "> ";
         getline(cin, body);
         if (body == "!quit") {
             break;

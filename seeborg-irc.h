@@ -1,6 +1,10 @@
 #ifndef __SEEBORG_IRC_H__
 #define __SEEBORG_IRC_H__
 
+#include <string>
+
+#include "seeborg.h"
+
 // Bot commands
 // ---------------------------------------------------------------------------
 std::string CMD_Shutup_f(class SeeBorg *self, const std::string command);
@@ -19,7 +23,7 @@ std::string CMD_ircHelp_f(class SeeBorg *self, const std::string command);
 
 std::string ircParseCommands(const std::string command, const char *who);
 
-static botcommand_t ircbotcmds[] = {
+static const botcommand_t ircbotcmds[] = {
     {"help", "Show this command list", CMD_ircHelp_f},
     {"shutup", "As the name says", CMD_Shutup_f},
     {"wakeup", "As the name says", CMD_Wakeup_f},
@@ -42,7 +46,7 @@ static botcommand_t ircbotcmds[] = {
     {NULL, NULL, NULL}
 };
 
-static int numircbotcmds = sizeof(ircbotcmds) / sizeof(ircbotcmds[0]) - 1;
+static const int numircbotcmds = sizeof(ircbotcmds) / sizeof(ircbotcmds[0]) - 1;
 
 
 // Bot Settings

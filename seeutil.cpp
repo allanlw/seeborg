@@ -1,5 +1,6 @@
 #include <cctype>
 #include <algorithm>
+#include <cstring>
 
 #include "seeutil.h"
 
@@ -18,7 +19,9 @@ int tokenizeString(string &instr, vector < string > &outtokens)
     int sz = splitpos.size();
     int nstart = 0;
     int nend = instr.npos;
-    for (int i = 0; i < sz; i++) {
+    int i;
+
+    for (i = 0; i < sz; i++) {
         nend = splitpos[i];
         if (nend == -1) {
             outtokens.push_back(instr.substr(nstart));
