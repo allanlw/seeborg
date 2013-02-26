@@ -6,7 +6,7 @@ CFCPU = -march=native -mtune=native
 CFOPT = -O2
 CFUSER = -pthread
 
-SRCS = seeborg.cpp seeutil.cpp
+SRCS = seeborg.cpp seeutil.cpp seecmds.cpp
 
 # -------
 #
