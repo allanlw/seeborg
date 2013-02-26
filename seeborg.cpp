@@ -1,4 +1,3 @@
-#include <cstdio>
 #include <fstream>
 
 #include "seeborg.h"
@@ -32,16 +31,12 @@ int SeeBorg::LoadSettings(void)
 
 int SeeBorg::SaveSettings(void)
 {
-    FILE *f = fopen("lines.txt", "wb");
+    ofstream ofs("lines.txt");
     set < string >::iterator it;
     for (it = lines.begin(); it != lines.end(); ++it) {
-        const char *str = (*it).c_str();
-
-        fputs(str, f);
-        fputs("\n", f);
+        ofs << *it << endl;
     }
-
-    fclose(f);
+    ofs.close();
     return true;
 }
 
