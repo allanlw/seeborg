@@ -1,4 +1,5 @@
 #include <cstdio>
+#include <fstream>
 
 #include "seeborg.h"
 #include "seeutil.h"
@@ -9,16 +10,17 @@ int SeeBorg::LoadSettings(void)
 {
     // TODO: WIP
     string str;
-    FILE *f = fopen("lines.txt", "rb");
-    if (f == NULL) {
+    ifstream ifs("lines.txt");
+    if (ifs.bad()) {
         printf("Not found, creating dictionary.\n");
         return false;
     }
 
-    while (fReadStringLine(f, str)) {
+    while (getline(ifs, str)) {
         this->Learn(str);
     }
-    fclose(f);
+
+    ifs.close();
 
     printf("Parsed %i lines.\n", lines.size());
     printf("I know %i words (%i contexts, %.2f per word), %i lines.\n",

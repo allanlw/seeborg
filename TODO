@@ -11,5 +11,6 @@ in no particular order:
  - Better CTCP replies (replies to everything with the same thing)
  - Optimize (there's a lot of room for that, like, remove std::string)
  - Write documentation (man pages, win32 chm, so on)
+ - tokenizeString and splitString are basically exactly the same
 
 For more, grep the source files for 'TODO'.

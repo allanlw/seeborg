@@ -12,6 +12,7 @@
 #include <csignal>
 #include <clocale>
 #include <cctype>
+#include <fstream>
 
 #include "seeborg.h"
 #include "seeborg-irc.h"
@@ -140,12 +141,12 @@ static int numconfigsettings =
 void LoadBotSettings()
 {
     string str;
-    FILE *f = fopen("seeborg-irc.cfg", "r");
-    if (f == NULL) {
+    ifstream ifs("seeborg-irc.cfg");
+    if (ifs.bad()) {
         return;
     }
 
-    while (fReadStringLine(f, str)) {
+    while (getline(ifs, str)) {
         trimString(str);
         if (str[0] == ';') {
             continue;
@@ -218,7 +219,7 @@ void LoadBotSettings()
             }
         }
     }
-    fclose(f);
+    ifs.close();
 }
 
 void SaveBotSettings()

@@ -1,4 +1,5 @@
 #include <cctype>
+#include <algorithm>
 
 #include "seeutil.h"
 
@@ -76,90 +77,25 @@ string joinString(vector < string > &tokens)
     return str;
 }
 
-
-int lowerString(string &str)
+void lowerString(string &str)
 {
-    char *cmess = strdup(str.c_str());
-    lowerString(cmess);
-    str = cmess;
-    free(cmess);
-
-    return true;
+    std::transform(str.begin(), str.end(), str.begin(), ptr_fun<int, int>(tolower));
 }
 
-int lowerString(char *str)
+void lowerString(char *str)
 {
-    int sz = strlen(str);
-    for (int i = 0; i < sz; i++) {
-        str[i] = tolower(str[i]);
+    for (char *p = str; *p; p++) {
+      *p = tolower(*p);
     }
-
-    return true;
 }
 
-
-int trimString(string &str)
+void trimString(string &str)
 {
-    // TODO: Optimize
-    while (1) {
-        if (str.empty()) {
-            break;
-        }
-        if (str[0] == ' ') {
-            str.erase(0, 1);
-        } else if (str[0] == '\r') {
-            str.erase(0, 1);
-        } else if (str[0] == '\n') {
-            str.erase(0, 1);
-        } else {
-            break;
-        }
-    }
-
-    while (1) {
-        if (str.empty()) {
-            break;
-        }
-        if (str[str.size() - 1] == ' ') {
-            str.erase(str.size() - 1);
-        } else if (str[str.size() - 1] == '\r') {
-            str.erase(str.size() - 1, 1);
-        } else if (str[str.size() - 1] == '\n') {
-            str.erase(str.size() - 1, 1);
-        } else {
-            break;
-        }
-    }
-    return true;
+    // creds to http://stackoverflow.com/questions/216823/whats-the-best-way-to-trim-stdstring
+    // do left trim then right trim
+    str.erase(str.begin(), find_if(str.begin(), str.end(), not1(ptr_fun<int, int>(isspace))));
+    str.erase(find_if(str.rbegin(), str.rend(), not1(ptr_fun<int, int>(isspace))).base(), str.end());
 }
-
-
-
-// Reads string from file until we reach EOF or newline
-// ---
-int fReadStringLine(FILE *f, string &str)
-{
-    str.erase(0, str.npos);
-    char s[65536];
-    s[65535] = 104;
-
-    for (;;) {
-        if (fgets((char *) &s, sizeof(s), f) == NULL) {
-            return false;
-        }
-        str += s;
-
-        if (s[65535] != 104) {
-            s[65535] = 104;
-            continue;
-        } else {
-            break;
-        }
-    }
-    return true;
-}
-
-
 
 // Arguments from string
 // ---

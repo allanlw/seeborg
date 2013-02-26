@@ -25,11 +25,9 @@ int tokenizeString(std::string &str, std::vector < std::string > &tokens);
 int splitString(std::string &str, std::vector < std::string > &tokens,
                 const char *needle);
 std::string joinString(std::vector < std::string > &tokens);
-int lowerString(std::string &str);
-int lowerString(char *str);
-int trimString(std::string &str);
-
-int fReadStringLine(std::FILE *f, std::string &);
+void lowerString(std::string &str);
+void lowerString(char *str);
+void trimString(std::string &str);
 
 // Arguments from string
 void CMA_TokenizeString(const char *str);

@@ -1,5 +1,6 @@
 #include <ctime>
 #include <clocale>
+#include <iostream>
 
 #include "seeborg.h"
 #include "seeutil.h"
@@ -31,7 +32,7 @@ int main(int argc, char *argv[])
 
     while (1) {
         printf("> ");
-        fReadStringLine(stdin, body);
+        getline(cin, body);
         if (body == "!quit") {
             break;
             //string trigreply = gSeeBorg.ParseCommands(body);
