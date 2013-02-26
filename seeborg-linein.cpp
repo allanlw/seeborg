@@ -35,7 +35,7 @@ int main(int argc, char *argv[])
     while (1) {
         cout << "> ";
         getline(cin, body);
-        if (body == "!quit") {
+        if (body == "!quit" || cin.bad() || cin.eof()) {
             break;
             //string trigreply = gSeeBorg.ParseCommands(body);
             //if (trigreply != "") PrintReply (trigreply);
