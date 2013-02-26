@@ -142,7 +142,7 @@ int fReadStringLine(FILE* f, string &str)
 
 static int cma_argc = 0;
 static char*	cma_argv[MAX_CMA_TOKENS];
-static char*	cma_nullstring = "";	// Need to return address of this sometimes
+static const char*	cma_nullstring = "";	// Need to return address of this sometimes
 
 
 // Call with NULL to free any resources used by CMA

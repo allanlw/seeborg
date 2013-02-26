@@ -1,0 +1,6 @@
+*.o
+*.d
+seeborg-irc
+seeborg-linein
+seeborg-irc.cfg
+lines.txt

@@ -101,8 +101,8 @@ botsettings_t botsettings;
 // ---------------------------------------------------------------------------
 
 typedef struct configsetting_s {
-  char*		configline;
-  char* 	description;
+  const char*		configline;
+  const char* 	description;
 
   string*	stringptr;
   float*	floatptr;

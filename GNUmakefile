@@ -6,7 +6,7 @@ TGTDIR=./
 FNAMEIRC=seeborg-irc
 FNAMELINEIN=seeborg-linein
 
-CFCPU = -march=pentium
+CFCPU = -march=native -mtune=native
 CFCPU += -mno-push-args
 
 CFOPT = -O2
