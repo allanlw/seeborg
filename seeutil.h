@@ -19,7 +19,7 @@ inline int randInt(int min, int max)
     return (int) roundf(randFloat(min,max));
 }
 
-int tokenizeString(std::string &str, std::vector < std::string > &tokens);
+void tokenizeString(const std::string &str, std::vector<std::string> &tokens);
 int splitString(std::string &str, std::vector < std::string > &tokens,
                 const char *needle);
 std::string joinString(std::vector < std::string > &tokens);

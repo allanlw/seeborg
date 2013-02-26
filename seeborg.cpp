@@ -94,10 +94,8 @@ string SeeBorg::Reply(string message)
         int c = this->words[sentence[0]].size();
         context_t l = this->words[sentence[0]][rand() % (c)];
         int w = l.second;
-        // NOTE: cline is needed since tokenizeString messes with its arguments
-        string cline = *(l.first);
-        vector < string > cwords;
-        tokenizeString(cline, cwords);
+        vector<string> cwords;
+        tokenizeString(*(l.first), cwords);
 
         int depth =
             rand() % (max_context_depth - min_context_depth) +
@@ -127,9 +125,8 @@ string SeeBorg::Reply(string message)
         int c = this->words[sentence.back()].size();
         context_t l = this->words[sentence.back()][rand() % (c)];
         int w = l.second;
-        string cline = *(l.first);
-        vector < string > cwords;
-        tokenizeString(cline, cwords);
+        vector<string> cwords;
+        tokenizeString(*(l.first), cwords);
 
         int depth =
             rand() % (max_context_depth - min_context_depth) +
@@ -180,7 +177,6 @@ int SeeBorg::LearnLine(string &line)
     if (line[0] == '[') {
         return false;
     }
-
 
     vector < string > curwords;
     tokenizeString(line, curwords);

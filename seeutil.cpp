@@ -1,37 +1,19 @@
 #include <cctype>
 #include <algorithm>
 #include <cstring>
+#include <iterator>
+#include <sstream>
 
 #include "seeutil.h"
 
 using namespace std;
 
-int tokenizeString(string &instr, vector < string > &outtokens)
+void tokenizeString(const string &instr, vector<string> &outtokens)
 {
-    vector < int >splitpos;
-    for (int n = instr.find(' '); n != instr.npos; n = instr.find(' ', n)) {
-        splitpos.push_back(n);
-        n++;
-    }
-
-    splitpos.push_back(instr.npos);
-
-    int sz = splitpos.size();
-    int nstart = 0;
-    int nend = instr.npos;
-    int i;
-
-    for (i = 0; i < sz; i++) {
-        nend = splitpos[i];
-        if (nend == -1) {
-            outtokens.push_back(instr.substr(nstart));
-        } else {
-            outtokens.push_back(instr.substr(nstart, nend - nstart));
-        }
-        nstart = nend + 1;
-    }
-
-    return true;
+    istringstream iss(instr);
+    copy(istream_iterator<string>(iss),
+         istream_iterator<string>(),
+         back_inserter<vector<string> >(outtokens));
 }
 
 int splitString(string &instr, vector < string > &outtokens,
