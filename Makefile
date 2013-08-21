@@ -16,7 +16,7 @@ CXX = g++
 CFLAGS = $(CFCPU) $(CFOPT) $(CFDEBUG) $(CFUSER)
 CXXFLAGS = $(CFLAGS)
 
-SRC_IRC = $(FNAMEIRC).cpp $(wildcard botnet/*.c)
+SRC_IRC = $(FNAMEIRC).cpp $(wildcard $(FNAMEIRC)-*.cpp) $(wildcard botnet/*.c)
 SRC_LINEIN = $(FNAMELINEIN).cpp
 
 TGT_IRC = $(TGTDIR)/$(FNAMEIRC)
