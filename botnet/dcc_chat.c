@@ -22,7 +22,7 @@ void *ThreadProc_Accept(void *);
 
 bool BN_CreateChatSocket(BN_PChat Chat,const char *Addr,int Port)
 {
-  int len;
+  socklen_t len;
 
   Chat->Socket = socket(AF_INET,SOCK_STREAM,IPPROTO_IP);
   if( Chat->Socket == -1 ) {
@@ -114,7 +114,7 @@ void *ThreadProc_SendRequest(void *Info)
   int Flg;
   char Msg[150];
   struct sockaddr_in SockAddrIn;
-  int size;
+  socklen_t size;
   void *Saf,*Saf2;
   BN_PTempoStruct TS;
 
@@ -300,7 +300,7 @@ void BN_CloseDCCChat(BN_PInfo I,BN_PChat Chat)
 
 char *BN_WaitForDCCChatMessage(BN_PInfo I,BN_PChat Chat)
 {
-  int len;
+  socklen_t len;
   char *buf,*pos;
   int blocking=0;
   int ajout=2;
@@ -406,7 +406,7 @@ void BN_CreateDCCChatProcess(BN_PInfo I,BN_PChat Chat)
 {
   char *S;
   int sock;
-  int len;
+  socklen_t len;
 
   while(Chat->Status == CHAT_REQUEST)
   {

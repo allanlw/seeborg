@@ -25,7 +25,7 @@ void *ThreadProc_AcceptSend(void *);
 
 bool BN_CreateSendSocket(BN_PSend Send, const char *Addr, int Port)
 {
-  int len;
+  socklen_t len;
 
   Send->Socket = socket(AF_INET,SOCK_STREAM,IPPROTO_IP);
   if( Send->Socket == -1 ) {
@@ -119,7 +119,7 @@ void *ThreadProc_SendRequestSend(void *Info)
   int Flg,Timeout;
   char Msg[150];
   struct sockaddr_in SockAddrIn;
-  int size;
+  socklen_t size;
   void *Saf,*Saf2;
 #ifdef _WIN32 /* HMage: in MSVC, this is called '_stat', oddly */
   struct _stat statbuf;
@@ -311,7 +311,7 @@ void BN_CreateDCCSendProcess(BN_PInfo I,BN_PSend Send,const int TimeOut)
 {
   char *S;
   int sock;
-  int len;
+  socklen_t len;
   FILE *File;
   int res;
   unsigned int sent;
@@ -434,7 +434,7 @@ void BN_CreateDCCGetProcess(BN_PInfo I,BN_PSend Send)
   int sock;
   FILE *File;
   int res;
-  unsigned int len;
+  socklen_t len;
   unsigned int received;
   unsigned int overflow;
   char Buffer[DCC_PACKETSIZE];

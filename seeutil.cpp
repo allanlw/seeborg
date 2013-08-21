@@ -19,8 +19,8 @@ void tokenizeString(const string &instr, vector<string> &outtokens)
 int splitString(string &instr, vector < string > &outtokens,
                 const char *needle)
 {
-    vector < int >splitpos;
-    for (int n = instr.find(needle); n != instr.npos;
+    vector<string::size_type> splitpos;
+    for (string::size_type n = instr.find(needle); n != instr.npos;
             n = instr.find(needle, n)) {
         instr.erase(n, strlen(needle));
         splitpos.push_back(n);
@@ -29,10 +29,8 @@ int splitString(string &instr, vector < string > &outtokens,
     //  sort (splitpos.begin(), splitpos.end());
     splitpos.push_back(instr.npos);
 
-    int sz = splitpos.size();
-    int nstart = 0;
-    int nend = instr.npos;
-    int i;
+    vector<string::size_type>::size_type sz = splitpos.size(), i;
+    string::size_type nstart = 0, nend = instr.npos;
 
     for (i = 0; i < sz; i++) {
         nend = splitpos[i];
