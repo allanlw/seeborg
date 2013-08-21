@@ -3,7 +3,7 @@ FNAMEIRC=seeborg-irc
 FNAMELINEIN=seeborg-linein
 
 CFOPT = -O2
-CFUSER = -pthread
+CFUSER = -pthread -Wall -Wextra -Wno-unused-parameter
 
 SRCS = seeborg.cpp seeutil.cpp seecmds.cpp
 

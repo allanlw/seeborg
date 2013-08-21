@@ -5,13 +5,16 @@
 #include "seeborg.h"
 #include "seeutil.h"
 
+#define LINE_SEP "."
+#define LINES_TXT "lines.txt"
+
 using namespace std;
 
 int SeeBorg::LoadSettings(void)
 {
     // TODO: WIP
     string str;
-    ifstream ifs("lines.txt");
+    ifstream ifs(LINES_TXT);
     if (ifs.bad()) {
         printf("Not found, creating dictionary.\n");
         return false;
@@ -33,7 +36,7 @@ int SeeBorg::LoadSettings(void)
 
 int SeeBorg::SaveSettings(void)
 {
-    ofstream ofs("lines.txt");
+    ofstream ofs(LINES_TXT);
     set < string >::iterator it;
     for (it = lines.begin(); it != lines.end(); ++it) {
         ofs << *it << endl;
@@ -48,7 +51,7 @@ string SeeBorg::Reply(string message)
     string replystring;
 
     vector < string > curlines;
-    splitString(message, curlines, ". ");
+    splitString(message, curlines, LINE_SEP);
     vector < string > curwords;
 
     int sz, i;
@@ -155,7 +158,7 @@ int SeeBorg::Learn(string &body)
 {
     FilterMessage(body);
     vector < string > curlines;
-    splitString(body, curlines, ". ");
+    splitString(body, curlines, LINE_SEP);
 
     int sz = curlines.size();
     for (int i = 0; i < sz; i++) {
@@ -245,17 +248,35 @@ int SeeBorg::FilterMessage(string &message)
         message.erase(n, 1);
     }
 
-    for (n = message.find("? "); n != message.npos;
-            n = message.find("? ", n)) {
-        message.replace(n, 2, "?. ");
+    for (n = message.find("?"); n != message.npos;
+            n = message.find("?", n)) {
+        message.replace(n, 1, "?.");
+        n++;
     }
 
-    for (n = message.find("! "); n != message.npos;
-            n = message.find("! ", n)) {
-        message.replace(n, 2, "!. ");
+    for (n = message.find("!"); n != message.npos;
+            n = message.find("!", n)) {
+        message.replace(n, 1, "!.");
+        n++;
+    }
+
+    // Remove message start text in the form NICK: from the start
+    if ((n = message.find(':')) != string::npos) {
+        bool fail = false;
+        for (int i = 0; i < n; i++) {
+            if (!isalnum(message[i]) && message[i] != '_' &&
+                message[i] != '-') {
+                fail = true;
+                break;
+            }
+        }
+        if (!fail) {
+            message.erase(0, n+1);
+        }
     }
 
     lowerString(message);
+
     return true;
 }
 
