@@ -37,7 +37,7 @@ int SeeBorg::LoadSettings(void)
 int SeeBorg::SaveSettings(void)
 {
     ofstream ofs(LINES_TXT);
-    set < string >::iterator it;
+    set<string>::iterator it;
     for (it = lines.begin(); it != lines.end(); ++it) {
         ofs << *it << endl;
     }
@@ -50,9 +50,9 @@ string SeeBorg::Reply(string message)
     FilterMessage(message);
     string replystring;
 
-    vector < string > curlines;
+    vector<string> curlines;
     splitString(message, curlines, LINE_SEP);
-    vector < string > curwords;
+    vector<string> curwords;
 
     int sz, i;
     for (sz = curlines.size(), i = 0; i < sz; i++) {
@@ -64,7 +64,7 @@ string SeeBorg::Reply(string message)
     }
     // Filter out the words we don't know about
     int known = -1;
-    vector < string > index;
+    vector<string> index;
     for (sz = curwords.size(), i = 0; i < sz; i++) {
         string &x = curwords[i];
         if (words.find(x) == words.end()) {
@@ -84,7 +84,7 @@ string SeeBorg::Reply(string message)
         return replystring;
     }
 
-    deque < string > sentence;
+    deque<string> sentence;
 
     // pick a random word to start building the reply
     int x = rand() % (index.size());
@@ -157,7 +157,7 @@ string SeeBorg::Reply(string message)
 int SeeBorg::Learn(string &body)
 {
     FilterMessage(body);
-    vector < string > curlines;
+    vector<string> curlines;
     splitString(body, curlines, LINE_SEP);
 
     int sz = curlines.size();
@@ -181,18 +181,18 @@ int SeeBorg::LearnLine(string &line)
         return false;
     }
 
-    vector < string > curwords;
+    vector<string> curwords;
     tokenizeString(line, curwords);
     string cleanline = joinString(curwords);
     if (lines.find(cleanline) != lines.end()) {
         return false;
     }
 
-    set < string >::iterator lineit = lines.insert(cleanline).first;
+    set<string>::iterator lineit = lines.insert(cleanline).first;
 
     int sz = curwords.size();
     for (int i = 0; i < sz; i++) {
-        map < string, word_t >::iterator wit = words.find(curwords[i]);
+        map<string, word_t>::iterator wit = words.find(curwords[i]);
         if (wit == words.end()) {
             word_t cword;
             context_t cxt(lineit, i);
@@ -320,7 +320,7 @@ string CMD_Known_f(class SeeBorg *self, const string command)
         return "Not enough parameters, usage: !known <word>";
     }
 
-    map < string, word_t >::iterator wit = self->words.find(CMA_Argv(1));
+    map<string, word_t>::iterator wit = self->words.find(CMA_Argv(1));
     static char retstr[4096];
     if (wit != self->words.end()) {
         int wordcontexts = ((*wit).second).size();

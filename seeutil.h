@@ -20,9 +20,9 @@ inline int randInt(int min, int max)
 }
 
 void tokenizeString(const std::string &str, std::vector<std::string> &tokens);
-int splitString(std::string &str, std::vector < std::string > &tokens,
+int splitString(std::string &str, std::vector<std::string> &tokens,
                 const char *needle);
-std::string joinString(std::vector < std::string > &tokens);
+std::string joinString(std::vector<std::string> &tokens);
 void lowerString(std::string &str);
 void lowerString(char *str);
 void trimString(std::string &str);

@@ -16,8 +16,8 @@ typedef struct botcommand_s {
     std::string(*func) (class SeeBorg *self, const std::string cmd);
 } botcommand_t;
 
-typedef std::pair < std::set < std::string >::iterator, int >context_t;
-typedef std::vector < context_t > word_t;
+typedef std::pair<std::set<std::string>::iterator, int>context_t;
+typedef std::vector<context_t> word_t;
 
 class SeeBorg
 {
@@ -43,8 +43,8 @@ public:
     int min_context_depth;
     int max_context_depth;
 
-    std::set < std::string > lines;
-    std::map < std::string, word_t > words;
+    std::set<std::string> lines;
+    std::map<std::string, word_t> words;
 
 };
 

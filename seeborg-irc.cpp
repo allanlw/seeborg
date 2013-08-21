@@ -69,8 +69,8 @@ typedef struct botsettings_s {
     string nickname;
     string username;
     string realname;
-    set < string > channels;
-    vector < ircbotowner_t > owners;
+    set<string> channels;
+    vector<ircbotowner_t> owners;
     string quitmessage;
 
     // Other settings
@@ -80,14 +80,14 @@ typedef struct botsettings_s {
 
     int speaking;
     int stealth;		// TODO
-    vector < string > censored;	// TODO
-    vector < string > ignorelist;	// TODO
+    vector<string> censored;	// TODO
+    vector<string> ignorelist;	// TODO
     int reply2ignored;		// TODO
 
     int joininvites;		// TODO
     float replyrate_mynick;
     float replyrate_magic;
-    vector < string > magicwords;
+    vector<string> magicwords;
 
     int autosaveperiod;
 
@@ -159,7 +159,7 @@ void LoadBotSettings()
             continue;
         }
 
-        vector < string > cursetting;
+        vector<string> cursetting;
 
         if (splitString(str, cursetting, "=") < 2) {
             continue;
@@ -168,7 +168,7 @@ void LoadBotSettings()
         trimString(cursetting[0]);
         trimString(cursetting[1]);
         if (!strcasecmp(cursetting[0].c_str(), "channels")) {
-            vector < string > cursplit;
+            vector<string> cursplit;
             if (!splitString(cursetting[1], cursplit, " ")) {
                 continue;
             }
@@ -180,7 +180,7 @@ void LoadBotSettings()
         }
 
         if (!strcasecmp(cursetting[0].c_str(), "owners")) {
-            vector < string > cursplit;
+            vector<string> cursplit;
             if (!splitString(cursetting[1], cursplit, " ")) {
                 continue;
             }
@@ -193,7 +193,7 @@ void LoadBotSettings()
         }
 
         if (!strcasecmp(cursetting[0].c_str(), "magicwords")) {
-            vector < string > cursplit;
+            vector<string> cursplit;
             if (!splitString(cursetting[1], cursplit, " ")) {
                 continue;
             }
@@ -254,7 +254,7 @@ void SaveBotSettings()
     fprintf(f, "; Channel list to join to\n");
     fprintf(f, "channels =");
 
-    set < string >::iterator it = botsettings.channels.begin();
+    set<string>::iterator it = botsettings.channels.begin();
     for (; it != botsettings.channels.end(); ++it) {
         fprintf(f, " %s", (*it).c_str());
     }
@@ -427,7 +427,7 @@ void ProcOnConnected(BN_PInfo I, const char HostName[])
 void ProcOnRegistered(BN_PInfo I)
 {
     printf("Registered...\n");
-    set < string >::iterator it = botsettings.channels.begin();
+    set<string>::iterator it = botsettings.channels.begin();
     for (; it != botsettings.channels.end(); ++it) {
         printf("Joining %s...\n", (*it).c_str());
         BN_SendJoinMessage(I, (*it).c_str(), NULL);
@@ -509,7 +509,7 @@ void ProcOnPrivateTalk(BN_PInfo I, const char Who[], const char Whom[],
     string reply = ProcessMessage(I, Who, Msg, true);
 
     if (!reply.empty()) {
-        vector < string > curlines;
+        vector<string> curlines;
         splitString(reply, curlines, "\n");
         for (int i = 0, sz = curlines.size(); i < sz; i++) {
             printf("%s -> %s: %s\n", Whom, nickname, reply.c_str());
@@ -529,7 +529,7 @@ void ProcOnChannelTalk(BN_PInfo I, const char Chan[], const char Who[],
     string reply = ProcessMessage(I, Who, Msg);
 
     if (!reply.empty()) {
-        vector < string > curlines;
+        vector<string> curlines;
         splitString(reply, curlines, "\n");
         for (int i = 0, sz = curlines.size(); i < sz; i++) {
             printf("(%s) <%s> %s\n", Chan, I->Nick, reply.c_str());
@@ -571,7 +571,7 @@ void ProcOnJoin(BN_PInfo I, const char Chan[], const char Who[])
 
     string reply = ProcessMessage(I, Who, nickname);
     if (!reply.empty()) {
-        vector < string > curlines;
+        vector<string> curlines;
         splitString(reply, curlines, "\n");
         for (int i = 0, sz = curlines.size(); i < sz; i++) {
             printf("(%s) %s: %s\n", Chan, I->Nick, reply.c_str());
@@ -595,7 +595,7 @@ void ProcOnPart(BN_PInfo I, const char Chan[], const char Who[],
            username, hostname, Msg);
     string reply = ProcessMessage(I, Who, nickname);
     if (!reply.empty()) {
-        vector < string > curlines;
+        vector<string> curlines;
         splitString(reply, curlines, "\n");
         for (int i = 0, sz = curlines.size(); i < sz; i++) {
             printf("(%s) %s: %s\n", Chan, I->Nick, reply.c_str());
