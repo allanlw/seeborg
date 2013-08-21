@@ -13,7 +13,7 @@
 typedef struct botcommand_s {
     const char *command;
     const char *description;
-    std::string(*func) (class SeeBorg *self, const std::string cmd);
+    std::string(*func) (class SeeBorg *self, const std::string& cmd);
 } botcommand_t;
 
 typedef std::pair<std::set<std::string>::iterator, int>context_t;
@@ -53,14 +53,14 @@ typedef class SeeBorg seeborg_t;
 extern seeborg_t gSeeBorg;
 
 // Bot commands
-std::string CMD_Help_f(class SeeBorg *self, const std::string command);
-std::string CMD_Version_f(class SeeBorg *self, const std::string command);
-std::string CMD_Words_f(class SeeBorg *self, const std::string command);
-std::string CMD_Known_f(class SeeBorg *self, const std::string command);
-std::string CMD_Contexts_f(class SeeBorg *self, const std::string command);
-std::string CMD_Unlearn_f(class SeeBorg *self, const std::string command);
-std::string CMD_Replace_f(class SeeBorg *self, const std::string command);
-std::string CMD_Quit_f(class SeeBorg *self, const std::string command);
+std::string CMD_Help_f(class SeeBorg *self, const std::string& command);
+std::string CMD_Version_f(class SeeBorg *self, const std::string& command);
+std::string CMD_Words_f(class SeeBorg *self, const std::string& command);
+std::string CMD_Known_f(class SeeBorg *self, const std::string& command);
+std::string CMD_Contexts_f(class SeeBorg *self, const std::string& command);
+std::string CMD_Unlearn_f(class SeeBorg *self, const std::string& command);
+std::string CMD_Replace_f(class SeeBorg *self, const std::string& command);
+std::string CMD_Quit_f(class SeeBorg *self, const std::string& command);
 
 extern const botcommand_t botcmds[];
 extern const int numbotcmds;

@@ -5,6 +5,7 @@
 #include <cstdlib>
 #include <vector>
 #include <cmath>
+#include <cstring>
 
 inline float randFloat(float min, float max)
 {
@@ -26,6 +27,10 @@ std::string joinString(std::vector<std::string> &tokens);
 void lowerString(std::string &str);
 void lowerString(char *str);
 void trimString(std::string &str);
+
+inline bool equalIString(const std::string &a, const std::string &b) {
+    return !strcasecmp(a.c_str(), b.c_str());
+}
 
 // Arguments from string
 void CMA_TokenizeString(const char *str);

@@ -282,9 +282,9 @@ int SeeBorg::FilterMessage(string &message)
 
 // ---------------------------------------------------------------------------
 
-string CMD_Help_f(class SeeBorg *self, const string command)
+string CMD_Help_f(class SeeBorg *self, const string& command)
 {
-    static string retstr;
+    string retstr;
     retstr = "Core SeeBorg commands:\n";
     for (int i = 0; i < numbotcmds; i++) {
         retstr += "!";
@@ -296,15 +296,15 @@ string CMD_Help_f(class SeeBorg *self, const string command)
     return retstr;
 }
 
-string CMD_Version_f(class SeeBorg *self, const string command)
+string CMD_Version_f(class SeeBorg *self, const string& command)
 {
     return "I am SeeBorg v" SEEBORGVERSIONSTRING
            " by Eugene 'HMage' Bujak";
 }
 
-string CMD_Words_f(class SeeBorg *self, const string command)
+string CMD_Words_f(class SeeBorg *self, const string& command)
 {
-    static char retstr[4096];
+    char retstr[4096];
 
     snprintf(retstr, 4096,
              "I know %i words (%i contexts, %.2f per word), %i lines.",
@@ -314,41 +314,42 @@ string CMD_Words_f(class SeeBorg *self, const string command)
     return retstr;
 }
 
-string CMD_Known_f(class SeeBorg *self, const string command)
+string CMD_Known_f(class SeeBorg *self, const string& command)
 {
     if (CMA_Argc() < 2) {
         return "Not enough parameters, usage: !known <word>";
     }
 
-    map<string, word_t>::iterator wit = self->words.find(CMA_Argv(1));
-    static char retstr[4096];
+    string lookup = CMA_Argv(1);
+
+    map<string, word_t>::iterator wit = self->words.find(lookup);
     if (wit != self->words.end()) {
+        char retstr[4096];
         int wordcontexts = ((*wit).second).size();
         snprintf(retstr, 4096, "%s is known (%i contexts)", CMA_Argv(1),
                  wordcontexts);
+        return retstr;
     } else {
-        snprintf(retstr, 4096, "%s is unknown", CMA_Argv(1));
+        return lookup + " is unknown";
     }
-
-    return retstr;
 }
 
-string CMD_Contexts_f(class SeeBorg *self, const string command)
+string CMD_Contexts_f(class SeeBorg *self, const string& command)
 {
     return "Not implemented yet";
 }
 
-string CMD_Unlearn_f(class SeeBorg *self, const string command)
+string CMD_Unlearn_f(class SeeBorg *self, const string& command)
 {
     return "Not implemented yet";
 }
 
-string CMD_Replace_f(class SeeBorg *self, const string command)
+string CMD_Replace_f(class SeeBorg *self, const string& command)
 {
     return "Not implemented yet";
 }
 
-string CMD_Quit_f(class SeeBorg *self, const string command)
+string CMD_Quit_f(class SeeBorg *self, const string& command)
 {
     exit(0);
 

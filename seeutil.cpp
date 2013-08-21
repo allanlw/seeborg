@@ -16,7 +16,7 @@ void tokenizeString(const string &instr, vector<string> &outtokens)
          back_inserter<vector<string> >(outtokens));
 }
 
-int splitString(string &instr, vector < string > &outtokens,
+int splitString(string &instr, vector<string> &outtokens,
                 const char *needle)
 {
     vector<string::size_type> splitpos;
@@ -45,7 +45,7 @@ int splitString(string &instr, vector < string > &outtokens,
     return i;
 }
 
-string joinString(vector < string > &tokens)
+string joinString(vector<string> &tokens)
 {
     string str;
 
