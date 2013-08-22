@@ -6,7 +6,7 @@ CFOPT = -O2
 CFUSER = -pthread
 CFUSER += -Wall -Wextra -Wno-unused-parameter -Wno-sign-compare -Wno-format
 
-SRCS = seeborg.cpp seeutil.cpp seecmds.cpp
+SRCS = seeborg.cpp seeutil.cpp
 
 # -------
 #

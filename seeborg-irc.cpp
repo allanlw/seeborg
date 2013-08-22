@@ -77,13 +77,7 @@ static string ProcessMessage(BN_PInfo I, const string &hostname,
         string stdcmdreply;
         if (!isOwner(hostname, nickname)) return "";
 
-        stdcmdreply = ircParseCommands(stdmessage);
-        if (stdcmdreply != "") return stdcmdreply;
-
-        stdcmdreply = gSeeBorg.ParseCommands(stdmessage);
-        if (stdcmdreply != "") return stdcmdreply;
-
-        return "";
+        return gSeeBorg.ParseCommands(stdmessage);
     }
 
     trimString(stdmessage);
@@ -395,6 +389,9 @@ int main(int argc, char *argv[])
     signal(SIGQUIT, sig_term);
     signal(SIGHUP, sig_term);
 #endif
+
+    InstallIrcCommands(&gSeeBorg);
+
     cleanedup = false;
     atexit(cleanup);
 

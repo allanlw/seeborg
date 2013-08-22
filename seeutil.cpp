@@ -3,6 +3,7 @@
 #include <cstring>
 #include <iterator>
 #include <sstream>
+#include <iostream>
 
 #include "seeutil.h"
 
@@ -80,69 +81,28 @@ void trimString(string &str)
     str.erase(find_if(str.rbegin(), str.rend(), not1(ptr_fun<int, int>(isspace))).base(), str.end());
 }
 
-// Arguments from string
-// ---
-#define MAX_CMA_TOKENS 80
-
-static int cma_argc = 0;
-static char *cma_argv[MAX_CMA_TOKENS];
-static const char *cma_nullstring = "";	// Need to return address of this sometimes
-
-
 // Call with NULL to free any resources used by CMA
-void CMA_TokenizeString(const char *string)
+vector<string> CMA_TokenizeString(const string& str)
 {
-    // TODO: parse whitespace inside double quotes as one token
-    for (int i = 0; i < cma_argc; i++) {
-        delete[]cma_argv[i];
-    }
+    vector<string> res;
 
-    cma_argc = 0;
-
-    if (!string) {
-        return;
-    }
-
-    const char *text = string;
-    const char *text2 = string;
+    size_t i = 0, j = 0;
 
     while (1) {
         // skip whitespace, stop on \n
-        while (*text && *text <= ' ' && *text != '\n' && *text > 0) {
-            text++;
+        while (i < str.size() && str[i] <= ' ' && str[i] != '\n' && str[i] > 0) {
+            i++;
         }
-        if (!*text) {
-            return;
-        }
-        text2 = text;
-        while (*text && *text != ' ' && *text != '\n') {
-            text++;
+        if (i == str.size()) {
+            return res;
         }
 
-        int len = text - text2;
-//              printf ("%i\n", len);
-
-        cma_argv[cma_argc] = new char[len + 1];
-        char *str = cma_argv[cma_argc];
-        for (int i = 0; i < len; i++) {
-            *(str + i) = *(text2 + i);
+        j = i;
+        while (i < str.size() && str[i] != ' ' && str[i] != '\n') {
+            i++;
         }
-        *(str + len) = 0;
 
-        cma_argc++;
+        int len = i - j;
+        res.push_back(str.substr(j, len));
     }
-
-}
-
-int CMA_Argc(void)
-{
-    return cma_argc;
-}
-
-const char *CMA_Argv(unsigned int c)
-{
-    if (c >= (unsigned int) cma_argc) {
-        return cma_nullstring;
-    }
-    return cma_argv[c];
 }

@@ -209,20 +209,21 @@ int SeeBorg::LearnLine(string &line)
 }
 
 
-string SeeBorg::ParseCommands(const string cmd)
+string SeeBorg::ParseCommands(const string& cmd)
 {
     if (cmd[0] != '!') {
         return "";
     }
     string command = cmd;
     lowerString(command);
-    CMA_TokenizeString(command.c_str());
-    //  CMA_TokenizeString(command.c_str());
-    for (int i = 0; i < numbotcmds; i++) {
-        if (!strncmp
-                (CMA_Argv(0) + 1, botcmds[i].command,
-                 strlen(botcmds[i].command))) {
-            return botcmds[i].func(this, command);
+    vector<string> tokens = CMA_TokenizeString(command.c_str());
+    if (tokens.size() < 1) return ""; // this shouldn't happen...
+
+    string cmd_name = tokens[0].substr(1);
+
+    for (int i = 0; i < cmds.size(); i++) {
+        if (cmd_name == cmds[i].command) {
+            return cmds[i].func(this, tokens);
         }
     }
     return "";
@@ -282,27 +283,27 @@ int SeeBorg::FilterMessage(string &message)
 
 // ---------------------------------------------------------------------------
 
-string CMD_Help_f(class SeeBorg *self, const string& command)
+string CMD_Help_f(class SeeBorg *self, const vector<string>& toks)
 {
     string retstr;
-    retstr = "Core SeeBorg commands:\n";
-    for (int i = 0; i < numbotcmds; i++) {
+    retstr = "SeeBorg commands:\n";
+    for (int i = 0; i < self->cmds.size(); i++) {
         retstr += "!";
-        retstr += botcmds[i].command;
+        retstr += self->cmds[i].command;
         retstr += ": ";
-        retstr += botcmds[i].description;
+        retstr += self->cmds[i].description;
         retstr += "\n";
     }
     return retstr;
 }
 
-string CMD_Version_f(class SeeBorg *self, const string& command)
+string CMD_Version_f(class SeeBorg *self, const vector<string>& toks)
 {
     return "I am SeeBorg v" SEEBORGVERSIONSTRING
            " by Eugene 'HMage' Bujak";
 }
 
-string CMD_Words_f(class SeeBorg *self, const string& command)
+string CMD_Words_f(class SeeBorg *self, const vector<string>& toks)
 {
     char retstr[4096];
 
@@ -314,19 +315,19 @@ string CMD_Words_f(class SeeBorg *self, const string& command)
     return retstr;
 }
 
-string CMD_Known_f(class SeeBorg *self, const string& command)
+string CMD_Known_f(class SeeBorg *self, const vector<string>& toks)
 {
-    if (CMA_Argc() < 2) {
+    if (toks.size() < 2) {
         return "Not enough parameters, usage: !known <word>";
     }
 
-    string lookup = CMA_Argv(1);
+    const string& lookup = toks[1];
 
     map<string, word_t>::iterator wit = self->words.find(lookup);
     if (wit != self->words.end()) {
         char retstr[4096];
         int wordcontexts = ((*wit).second).size();
-        snprintf(retstr, 4096, "%s is known (%i contexts)", CMA_Argv(1),
+        snprintf(retstr, 4096, "%s is known (%i contexts)", lookup.c_str(),
                  wordcontexts);
         return retstr;
     } else {
@@ -334,24 +335,53 @@ string CMD_Known_f(class SeeBorg *self, const string& command)
     }
 }
 
-string CMD_Contexts_f(class SeeBorg *self, const string& command)
+string CMD_Contexts_f(class SeeBorg *self, const vector<string>& toks)
 {
     return "Not implemented yet";
 }
 
-string CMD_Unlearn_f(class SeeBorg *self, const string& command)
+string CMD_Unlearn_f(class SeeBorg *self, const vector<string>& toks)
 {
     return "Not implemented yet";
 }
 
-string CMD_Replace_f(class SeeBorg *self, const string& command)
+string CMD_Replace_f(class SeeBorg *self, const vector<string>& toks)
 {
     return "Not implemented yet";
 }
 
-string CMD_Quit_f(class SeeBorg *self, const string& command)
+string CMD_Quit_f(class SeeBorg *self, const vector<string>& toks)
 {
     exit(0);
 
     return "Wow!";
 }
+
+static const botcommand_t botcmds[] = {
+    {"help", "Show this command list", CMD_Help_f},
+    {"version", "Show SeeBorg version", CMD_Version_f},
+    {"words", "Show how many words the borg knows", CMD_Words_f},
+    {"known", "Query the bot if the word is known", CMD_Known_f},
+    {"contexts", "Show contexts containing the command argument", CMD_Contexts_f},
+    {"unlearn", "Unlearn the command argument", CMD_Unlearn_f},
+    {"replace", "Replace all occurences of old word with new one", CMD_Replace_f},
+
+    {"quit", "As the name implies", CMD_Quit_f},
+
+    {NULL, NULL, NULL}
+};
+
+SeeBorg::SeeBorg() {
+    num_contexts = 0;
+    min_context_depth = 1;
+    max_context_depth = 4;
+
+    AddCommands(botcmds);
+}
+
+void SeeBorg::AddCommands(const botcommand_t *cmds) {
+  for (int i = 0; cmds[i].command != NULL; i++) {
+    this->cmds.push_back(cmds[i]);
+  }
+}
+

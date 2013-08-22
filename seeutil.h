@@ -33,8 +33,6 @@ inline bool equalIString(const std::string &a, const std::string &b) {
 }
 
 // Arguments from string
-void CMA_TokenizeString(const char *str);
-int CMA_Argc(void);
-const char *CMA_Argv(unsigned int c);
+std::vector<std::string> CMA_TokenizeString(const std::string& str);
 
 #endif

@@ -35,18 +35,15 @@ int main(int argc, char *argv[])
     while (1) {
         cout << "> ";
         getline(cin, body);
-        if (body == "!quit" || cin.bad() || cin.eof()) {
-            break;
-            //string trigreply = gSeeBorg.ParseCommands(body);
-            //if (trigreply != "") PrintReply (trigreply);
-            //continue;
+        if (cin.bad() || cin.eof()) {
+          break;
+        } else if (body[0] == '!') {
+          PrintReply(gSeeBorg.ParseCommands(body));
+        } else {
+          PrintReply(gSeeBorg.Reply(body));
         }
-
-        string seeout = gSeeBorg.Reply(body);
-        PrintReply(seeout);
     }
 #endif
-
     gSeeBorg.SaveSettings();
     return 0;
 }
