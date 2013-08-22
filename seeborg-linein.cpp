@@ -7,13 +7,12 @@
 
 using namespace std;
 
-seeborg_t gSeeBorg;
+SeeBorg gSeeBorg;
 
 void PrintReply(string text)
 {
     cout << "<Seeborg> " << text  << endl;
 }
-
 
 int main(int argc, char *argv[])
 {

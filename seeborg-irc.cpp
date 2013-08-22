@@ -23,7 +23,7 @@ using namespace std;
 
 // Variables// ---------------------------------------------------------------------------
 BN_TInfo Info;
-seeborg_t gSeeBorg;
+SeeBorg gSeeBorg;
 bool connected = false;
 bool cleanedup = false;
 

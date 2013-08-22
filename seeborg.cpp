@@ -1,5 +1,5 @@
 #include <fstream>
-#include <cstring>
+//#include <cstring>
 #include <deque>
 
 #include "seeborg.h"
@@ -357,7 +357,7 @@ string CMD_Quit_f(class SeeBorg *self, const vector<string>& toks)
     return "Wow!";
 }
 
-static const botcommand_t botcmds[] = {
+static const BotCommand botcmds[] = {
     {"help", "Show this command list", CMD_Help_f},
     {"version", "Show SeeBorg version", CMD_Version_f},
     {"words", "Show how many words the borg knows", CMD_Words_f},
@@ -379,7 +379,7 @@ SeeBorg::SeeBorg() {
     AddCommands(botcmds);
 }
 
-void SeeBorg::AddCommands(const botcommand_t *cmds) {
+void SeeBorg::AddCommands(const BotCommand *cmds) {
   for (int i = 0; cmds[i].command != NULL; i++) {
     this->cmds.push_back(cmds[i]);
   }

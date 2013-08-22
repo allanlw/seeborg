@@ -10,13 +10,16 @@
 #define SEEBORGVERSIONMAJOR 51
 #define SEEBORGVERSIONSTRING "0.51 beta"
 
-typedef struct botcommand_s {
+class SeeBorg;
+
+struct BotCommand {
     const char *command;
     const char *description;
-    std::string(*func) (class SeeBorg *self, const std::vector<std::string>& toks);
-} botcommand_t;
+    std::string(*func) (SeeBorg *self,
+          const std::vector<std::string>& toks);
+};
 
-typedef std::pair<std::set<std::string>::iterator, int>context_t;
+typedef std::pair<std::set<std::string>::iterator, int> context_t;
 typedef std::vector<context_t> word_t;
 
 class SeeBorg
@@ -32,7 +35,7 @@ public:
 
     std::string ParseCommands(const std::string& command);
 
-    void AddCommands(const botcommand_t *);
+    void AddCommands(const BotCommand *);
 
 /* private: */
     int LearnLine(std::string &line);
@@ -46,12 +49,10 @@ public:
     std::set<std::string> lines;
     std::map<std::string, word_t> words;
 
-    std::vector<botcommand_t> cmds;
+    std::vector<BotCommand> cmds;
 };
 
-typedef class SeeBorg seeborg_t;
-
-extern seeborg_t gSeeBorg;
+extern SeeBorg gSeeBorg;
 
 // ---------------------------------------------------------------------------
 

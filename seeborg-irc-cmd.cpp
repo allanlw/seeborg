@@ -122,7 +122,7 @@ static string CMD_Save_f(class SeeBorg *self, const vector<string>& toks)
 }
 
 
-static const botcommand_t ircbotcmds[] = {
+static const BotCommand ircbotcmds[] = {
     {"shutup", "As the name says (IRC)", CMD_Shutup_f},
     {"wakeup", "As the name says (IRC)", CMD_Wakeup_f},
     {"join", "Join channel (IRC)", CMD_Join_f},

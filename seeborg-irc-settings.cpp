@@ -6,21 +6,21 @@
 
 using namespace std;
 
-botsettings_t botsettings;
+BotSettings botsettings;
 
 // Bot Config File
 // ---------------------------------------------------------------------------
 
-typedef struct configsetting_s {
+struct ConfigSetting {
     const char *configline;
     const char *description;
 
     string *stringptr;
     float *floatptr;
     int *intptr;
-} configsetting_t;
+};
 
-static const configsetting_t configsettings[] = {
+static const ConfigSetting configsettings[] = {
   {"server", "Address of IRC server", &botsettings.server, NULL, NULL},
   {"serverport", "Server port", NULL, NULL, &botsettings.serverport},
 
@@ -99,7 +99,7 @@ void LoadBotSettings()
             }
             botsettings.owners.clear();
             for (int i = 0, sz = cursplit.size(); i < sz; i++) {
-                ircbotowner_t ircbotowner;
+                IrcBotOwner ircbotowner;
                 ircbotowner.nickname = cursplit[i];
                 botsettings.owners.push_back(ircbotowner);
             }
@@ -117,7 +117,7 @@ void LoadBotSettings()
         }
 
         for (int i = 0; i < numconfigsettings; i++) {
-            const configsetting_t *s = &configsettings[i];
+            const ConfigSetting *s = &configsettings[i];
             if (s->configline == NULL) {
                 continue;
             }
@@ -147,7 +147,7 @@ void SaveBotSettings()
     int i, sz;
 
     for (i = 0; i < numconfigsettings; i++) {
-        const configsetting_t *s = &configsettings[i];
+        const ConfigSetting *s = &configsettings[i];
         if (s->configline == NULL) {
             fprintf(f, "\n\n");
             continue;

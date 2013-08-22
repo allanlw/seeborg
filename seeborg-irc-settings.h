@@ -7,13 +7,13 @@
 
 // Bot Settings
 // ---------------------------------------------------------------------------
-typedef struct ircbotowner_s {
+struct IrcBotOwner{
     std::string nickname;
     std::string hostname;
-} ircbotowner_t;
+};
 
-typedef struct botsettings_s {
-    botsettings_s() {
+struct BotSettings {
+    BotSettings() {
         nickname = "SeeBorg";
         username = "SeeBorg";
         realname = "I am SeeBorg v" SEEBORGVERSIONSTRING;
@@ -39,7 +39,7 @@ typedef struct botsettings_s {
     std::string username;
     std::string realname;
     std::set<std::string> channels;
-    std::vector<ircbotowner_t> owners;
+    std::vector<IrcBotOwner> owners;
     std::string quitmessage;
 
     // Other settings
@@ -60,9 +60,9 @@ typedef struct botsettings_s {
 
     int autosaveperiod;
 
-} botsettings_t;
+};
 
-extern botsettings_t botsettings;
+extern BotSettings botsettings;
 
 void LoadBotSettings();
 void SaveBotSettings();
