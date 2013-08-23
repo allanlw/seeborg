@@ -13,7 +13,7 @@
 
 using namespace std;
 
-static string CMD_Shutup_f(class SeeBorg *self, const vector<string>& toks)
+static string CMD_Shutup_f(SeeBorg *self, const vector<string>& toks)
 {
     if (!botsettings.speaking) {
         return "I'm already shut up *<:'-(";
@@ -23,7 +23,7 @@ static string CMD_Shutup_f(class SeeBorg *self, const vector<string>& toks)
     return "I'll shut up... :o";
 }
 
-static string CMD_Wakeup_f(class SeeBorg *self, const vector<string>& toks)
+static string CMD_Wakeup_f(SeeBorg *self, const vector<string>& toks)
 {
     if (botsettings.speaking) {
         return "I'm already awake! :-D";
@@ -33,7 +33,7 @@ static string CMD_Wakeup_f(class SeeBorg *self, const vector<string>& toks)
     return "Woohoo!";
 }
 
-static string CMD_Join_f(class SeeBorg *self, const vector<string>& toks)
+static string CMD_Join_f(SeeBorg *self, const vector<string>& toks)
 {
     if (toks.size() < 2) {
         return "Specify channels to join.";
@@ -48,7 +48,7 @@ static string CMD_Join_f(class SeeBorg *self, const vector<string>& toks)
     return "Joined specified channels.";
 }
 
-static string CMD_Part_f(class SeeBorg *self, const vector<string>& toks)
+static string CMD_Part_f(SeeBorg *self, const vector<string>& toks)
 {
     if (toks.size() < 2) {
         return "Specify channels to leave.";
@@ -67,7 +67,7 @@ static string CMD_Part_f(class SeeBorg *self, const vector<string>& toks)
     return "Left specified channels.";
 }
 
-static string CMD_Replyrate_f(class SeeBorg *self, const vector<string>& toks)
+static string CMD_Replyrate_f(SeeBorg *self, const vector<string>& toks)
 {
     char retstr[4096];
     if (toks.size() >= 2) {
@@ -79,7 +79,7 @@ static string CMD_Replyrate_f(class SeeBorg *self, const vector<string>& toks)
     return retstr;
 }
 
-static string CMD_Replynick_f(class SeeBorg *self, const vector<string>& toks)
+static string CMD_Replynick_f(SeeBorg *self, const vector<string>& toks)
 {
     char retstr[4096];
     if (toks.size() >= 2) {
@@ -91,7 +91,7 @@ static string CMD_Replynick_f(class SeeBorg *self, const vector<string>& toks)
     return retstr;
 }
 
-static string CMD_Replyword_f(class SeeBorg *self, const vector<string>& toks)
+static string CMD_Replyword_f(SeeBorg *self, const vector<string>& toks)
 {
     char retstr[4096];
     if (toks.size() >= 2) {
@@ -103,7 +103,7 @@ static string CMD_Replyword_f(class SeeBorg *self, const vector<string>& toks)
     return retstr;
 }
 
-static string CMD_Learning_f(class SeeBorg *self, const vector<string>& toks)
+static string CMD_Learning_f(SeeBorg *self, const vector<string>& toks)
 {
     if (toks.size() >= 2) {
         botsettings.learning = atoi(toks[1].c_str());
@@ -113,11 +113,11 @@ static string CMD_Learning_f(class SeeBorg *self, const vector<string>& toks)
     return retstr;
 }
 
-static string CMD_Save_f(class SeeBorg *self, const vector<string>& toks)
+static string CMD_Save_f(SeeBorg *self, const vector<string>& toks)
 {
     cout << "Saving settings...\n";
     SaveBotSettings();
-    gSeeBorg.SaveSettings();
+    self->SaveSettings();
     return "Settings saved.";
 }
 

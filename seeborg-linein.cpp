@@ -7,9 +7,7 @@
 
 using namespace std;
 
-SeeBorg gSeeBorg;
-
-void PrintReply(string text)
+static void PrintReply(const string& text)
 {
     cout << "<Seeborg> " << text  << endl;
 }
@@ -18,6 +16,8 @@ int main(int argc, char *argv[])
 {
     setlocale(LC_ALL, "");
 
+    SeeBorg lSeeBorg;
+
     cout << "SeeBorg v" SEEBORGVERSIONSTRING
         <<", copyright (C) 2003 Eugene Bujak." << endl << endl;
 
@@ -25,9 +25,8 @@ int main(int argc, char *argv[])
     srand(time(NULL));
 
     cout << "Loading dictionary..." << endl;
-    gSeeBorg.LoadSettings();
+    lSeeBorg.LoadSettings();
 
-#ifndef PROFILE
     cout << endl << "SeeBorg offline chat, learning disabled."
          << " Press CTRL-C to quit." << endl << endl;
 
@@ -37,12 +36,12 @@ int main(int argc, char *argv[])
         if (cin.bad() || cin.eof()) {
           break;
         } else if (body[0] == '!') {
-          PrintReply(gSeeBorg.ParseCommands(body));
+          PrintReply(lSeeBorg.ParseCommands(body));
         } else {
-          PrintReply(gSeeBorg.Reply(body));
+          PrintReply(lSeeBorg.Reply(body));
         }
     }
-#endif
-    gSeeBorg.SaveSettings();
+
+    lSeeBorg.SaveSettings();
     return 0;
 }

@@ -346,18 +346,13 @@ int main(int argc, char *argv[])
     gSeeBorg.LoadSettings();
     signal(SIGINT, sig_term);
     signal(SIGTERM, sig_term);
-#ifndef _WIN32
-    // Windows doesn't define these signals
-    signal(SIGQUIT, sig_term);
-    signal(SIGHUP, sig_term);
-#endif
 
     InstallIrcCommands(&gSeeBorg);
 
     cleanedup = false;
     atexit(cleanup);
 
-    while (!irc_connect(Session, botsettings.server.c_str(), 6667, 0, botsettings.nickname.c_str(),
+    while (!irc_connect(Session, botsettings.server.c_str(), botsettings.serverport, 0, botsettings.nickname.c_str(),
                 botsettings.username.c_str(), botsettings.realname.c_str())) {
         irc_run(Session);
         cout << "Disconnected.\n";

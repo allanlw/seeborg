@@ -37,10 +37,10 @@ public:
 
     void AddCommands(const BotCommand *);
 
-/* private: */
     int LearnLine(std::string &line);
     int FilterMessage(std::string &message);
 
+/* private: */
     int num_contexts;
 
     int min_context_depth;
@@ -51,9 +51,5 @@ public:
 
     std::vector<BotCommand> cmds;
 };
-
-extern SeeBorg gSeeBorg;
-
-// ---------------------------------------------------------------------------
 
 #endif

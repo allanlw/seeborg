@@ -69,7 +69,7 @@ void lowerString(string &str)
 void lowerString(char *str)
 {
     for (char *p = str; *p; p++) {
-      *p = tolower(*p);
+        *p = tolower(*p);
     }
 }
 
@@ -81,7 +81,6 @@ void trimString(string &str)
     str.erase(find_if(str.rbegin(), str.rend(), not1(ptr_fun<int, int>(isspace))).base(), str.end());
 }
 
-// Call with NULL to free any resources used by CMA
 vector<string> CMA_TokenizeString(const string& str)
 {
     vector<string> res;
