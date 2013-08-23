@@ -2,9 +2,8 @@ TGTDIR=./
 FNAMEIRC=seeborg-irc
 FNAMELINEIN=seeborg-linein
 
-CFOPT = -O2
-CFUSER = -pthread
-CFUSER += -Wall -Wextra -Wno-unused-parameter -Wno-sign-compare -Wno-format
+CFOPT = -O2 -fno-rtti -fno-exceptions
+CFUSER = -Wall -Wextra -Wno-unused-parameter -Wno-sign-compare -Wno-format
 
 SRCS = seeborg.cpp seeutil.cpp
 
@@ -15,7 +14,7 @@ CC = gcc
 CXX = g++
 CFLAGS = $(CFCPU) $(CFOPT) $(CFDEBUG) $(CFUSER)
 CXXFLAGS = $(CFLAGS)
-LDFLAGS = -lircclient
+LDFLAGS =
 
 SRC_IRC = $(FNAMEIRC).cpp $(wildcard $(FNAMEIRC)-*.cpp)
 SRC_LINEIN = $(FNAMELINEIN).cpp
@@ -42,7 +41,7 @@ compile: makedirs $(DEPS) $(TGT_LINEIN) $(TGT_IRC)
 
 $(TGT_IRC): $(OBJS) $(OBJ_IRC)
 	@echo Linking $@...
-	$(CXX) $(CXXFLAGS) $^ -o $@ $(LDFLAGS)
+	$(CXX) $(CXXFLAGS) $^ -o $@ $(LDFLAGS) -lircclient
 
 $(TGT_LINEIN): $(OBJS) $(OBJ_LINEIN)
 	@echo Linking $@...
