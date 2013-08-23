@@ -3,13 +3,11 @@
 
 #include "seeborg.h"
 
-extern "C" {
-#include "botnet/botnet.h"
-}
+#include <libircclient/libircclient.h>
 
 #include "seeborg-irc-settings.h"
 #include "seeborg-irc-cmd.h"
 
-extern BN_TInfo Info;
+extern irc_session_t *Session;
 
 #endif

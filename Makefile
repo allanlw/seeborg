@@ -15,8 +15,9 @@ CC = gcc
 CXX = g++
 CFLAGS = $(CFCPU) $(CFOPT) $(CFDEBUG) $(CFUSER)
 CXXFLAGS = $(CFLAGS)
+LDFLAGS = -lircclient
 
-SRC_IRC = $(FNAMEIRC).cpp $(wildcard $(FNAMEIRC)-*.cpp) $(wildcard botnet/*.c)
+SRC_IRC = $(FNAMEIRC).cpp $(wildcard $(FNAMEIRC)-*.cpp)
 SRC_LINEIN = $(FNAMELINEIN).cpp
 
 TGT_IRC = $(TGTDIR)/$(FNAMEIRC)

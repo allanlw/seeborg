@@ -1,13 +1,5 @@
-#ifdef __unix__
 #include <unistd.h>
 #include <sys/wait.h>
-#else
-#include <time.h>
-#ifdef _MSC_VER
-#pragma comment (lib, "wsock32.lib")
-#endif				// _MSC_VER
-#endif				// __unix__
-
 #include <csignal>
 #include <clocale>
 #include <cctype>
@@ -22,22 +14,20 @@
 using namespace std;
 
 // Variables// ---------------------------------------------------------------------------
-BN_TInfo Info;
 SeeBorg gSeeBorg;
-bool connected = false;
+irc_session_t *Session;
 bool cleanedup = false;
 
 // Hacky mackro to define functions that do extraction of the params
-#define DefExtract(X) \
+#define DefExtract(X, Y) \
 static inline string Extract ## X(const char *who) { \
     char buf[4096]; \
     buf[0] = '\0'; \
-    BN_Extract ## X(who, buf, sizeof(buf)); \
+    irc_target_get_ ## Y(who, buf, sizeof(buf)); \
     return string(buf); \
 }
-DefExtract(Host)
-DefExtract(Nick)
-DefExtract(ExactUserName)
+DefExtract(Host, host)
+DefExtract(Nick, nick)
 
 // Message processing
 // ---------------------------------------------------------------------------
@@ -65,7 +55,7 @@ static bool isOwner(const string& hostname, const string& nickname)
 }
 
 
-static string ProcessMessage(BN_PInfo I, const string &hostname,
+static string ProcessMessage(const string &hostname,
         const string &nickname, const char msg[], bool replying = false)
 {
     string stdmessage = msg;
@@ -108,7 +98,7 @@ static string ProcessMessage(BN_PInfo I, const string &hostname,
             }
         }
         if ((!replying) && (botsettings.replyrate_mynick > 0)) {
-            string nickname = I->Nick;
+            string nickname = botsettings.nickname;
             lowerString(nickname);
             if (stdmessage.find(nickname) != string::npos &&
                 randFloat(0, 99) < botsettings.replyrate_mynick) {
@@ -131,77 +121,39 @@ static string ProcessMessage(BN_PInfo I, const string &hostname,
 }
 
 
-static void DoChanTalk(BN_PInfo I, const string& hostname, const string &nickname,
+static void DoChanTalk(irc_session_t *S, const string& hostname, const string &nickname,
         const char *Msg, const char *Chan) {
-    string reply = ProcessMessage(I, hostname, nickname, Msg);
+    string reply = ProcessMessage(hostname, nickname, Msg);
 
     if (reply.empty()) return;
 
     vector<string> curlines;
     splitString(reply, curlines, "\n");
     for (int i = 0, sz = curlines.size(); i < sz; i++) {
-        cout << "(" << Chan << ") <" << I->Nick << "> " << reply << "\n";
-        BN_SendChannelMessage(I, Chan, curlines[i].c_str());
+        cout << "(" << Chan << ") <" << botsettings.nickname << "> " << reply << "\n";
+        irc_cmd_msg(S, Chan, curlines[i].c_str());
     }
 }
 
 // BotNet callback functions
 // ---------------------------------------------------------------------------
-static void ProcOnConnected(BN_PInfo I, const char HostName[])
+static void ProcOnConnected(irc_session_t *S, const char *event, const char *origin, const char **params, unsigned int count)
 {
-    cout << "Connected to " << HostName << "%s...\n";
-    BN_EnableFloodProtection(I, 1000, 1000, 60);
-    connected = true;
-    BN_Register(I, botsettings.nickname.c_str(),
-                botsettings.username.c_str(),
-                botsettings.realname.c_str());
-}
+    cout << "Connected...\n";
 
-
-static void ProcOnRegistered(BN_PInfo I)
-{
-    cout << "Registered...\n";
     set<string>::iterator it = botsettings.channels.begin();
     for (; it != botsettings.channels.end(); ++it) {
         const string &cname = *it;
         cout << "Joining " << cname << "...\n";
-        BN_SendJoinMessage(I, cname.c_str(), NULL);
+        irc_cmd_join(S, cname.c_str(), NULL);
     }
 }
 
-// returned string is freed then, so we malloc() the return string each call
-static char *ProcOnCTCP(BN_PInfo I, const char Who[], const char Whom[],
-                 const char Type[])
+static void ProcOnInvite(irc_session_t *S, const char *event, const char *origin, const char **params, unsigned int count)
 {
-    string nickname = ExtractNick(Who);
-    cout << "CTCP " << Type << " query by " << nickname
-         << " for " << Whom << "\n";
-
-    if (!strcasecmp(Type, "VERSION")) {
-        return strdup("mIRC32 v5.7 K.Mardam-Bey");
-    } else {
-        return strdup("Forget about it");
-    }
-}
-
-
-static void ProcOnPingPong(BN_PInfo I)
-{
-    static time_t oldtime = time(NULL);
-    if (oldtime + botsettings.autosaveperiod < time(NULL)) {
-        oldtime = time(NULL);
-        SaveBotSettings();
-        gSeeBorg.SaveSettings();
-    }
-}
-
-// ---
-
-static void ProcOnInvite(BN_PInfo I, const char Chan[], const char Who[],
-                  const char Whom[])
-{
-    string nickname = ExtractNick(Who);
-    string hostname = ExtractHost(Who);
+    string nickname = ExtractNick(origin);
+    string hostname = ExtractHost(origin);
+    const char *Chan = params[1];
     cout << "Received invitation to " << Chan << " by " << nickname << "\n";
 
     if (botsettings.joininvites) {
@@ -211,104 +163,119 @@ static void ProcOnInvite(BN_PInfo I, const char Chan[], const char Who[],
                 return;
             }
         }
-        BN_SendJoinMessage(I, Chan, NULL);
+        irc_cmd_join(S, Chan, NULL);
     }
 }
 
 
-static void ProcOnKick(BN_PInfo I, const char Chan[], const char Who[],
-                const char Whom[], const char Msg[])
+static void ProcOnKick(irc_session_t *S, const char *event, const char *origin, const char **params, unsigned int count)
 {
-    string nickname = ExtractNick(Who);
+    string nickname = ExtractNick(origin);
+    const char *Chan = params[0];
+    const char *Msg = params[2];
+    const char *Whom = params[1];
 
     cout << "(" << Chan << ") * " << Whom << " has been kicked from " << Chan
          << " by " << nickname << " [" << Msg << "]\n";
 
-    if (strstr(Whom, I->Nick) != NULL) {
-        BN_SendJoinMessage(I, Chan, NULL);
+    if (nickname == botsettings.nickname) {
+        irc_cmd_join(S, Chan, NULL);
     }
 }
 
 
-static void ProcOnPrivateTalk(BN_PInfo I, const char Who[], const char Whom[],
-                       const char Msg[])
+static void ProcOnPrivateTalk(irc_session_t *S, const char *event, const char *origin, const char **params, unsigned int count)
 {
-    string nickname = ExtractNick(Who);
-    string hostname = ExtractHost(Who);
+    string nickname = ExtractNick(origin);
+    string hostname = ExtractHost(origin);
+    const char *Msg = params[1];
+
     cout << nickname << ": " << Msg << "\n";
 
-    string reply = ProcessMessage(I, hostname, nickname, Msg, true);
+    string reply = ProcessMessage(hostname, nickname, Msg, true);
 
     if (!reply.empty()) {
         vector<string> curlines;
         splitString(reply, curlines, "\n");
         for (int i = 0, sz = curlines.size(); i < sz; i++) {
-            cout << Whom << " -> " << nickname << ": " << reply << "\n";
-            BN_SendPrivateMessage(I, nickname.c_str(), curlines[i].c_str());
+            cout << origin << " -> " << nickname << ": " << reply << "\n";
+            irc_cmd_msg(S, nickname.c_str(), curlines[i].c_str());
         }
     }
 }
 
 
-static void ProcOnChannelTalk(BN_PInfo I, const char Chan[], const char Who[],
-                       const char Msg[])
+static void ProcOnChannelTalk(irc_session_t *S, const char *event, const char *origin, const char **params, unsigned int count)
 {
-    string nickname = ExtractNick(Who);
-    string hostname = ExtractHost(Who);
+    string nickname = ExtractNick(origin);
+    string hostname = ExtractHost(origin);
+
+    const char *Chan = params[0];
+    const char *Msg = params[1];
+
     cout << "(" << Chan << ") <" << nickname << "> " << Msg << "\n";
 
-    DoChanTalk(I, hostname, nickname, Msg, Chan);
+    DoChanTalk(S, hostname, nickname, Msg, Chan);
 }
 
 
-static void ProcOnAction(BN_PInfo I, const char Chan[], const char Who[],
-                  const char Msg[])
+static void ProcOnAction(irc_session_t *S, const char *event, const char *origin, const char **params, unsigned int count)
 {
-    string nickname = ExtractNick(Who);
-    cout << "(" << Chan << ") * " << nickname << " " << Msg << "\n";
+    string nickname = ExtractNick(origin);
+    string hostname = ExtractHost(origin);
 
-    if (botsettings.learning) {
-        string line = nickname + " " + Msg;
-        gSeeBorg.Learn(line);
-    }
+    const char *Msg = params[0];
+    const char *Chan = params[1]; //?
+
+    string action = nickname + " " + Msg;
+
+    cout << "(" << Chan << ") * " << action << "\n";
+
+    DoChanTalk(S, hostname, nickname, action.c_str(), Chan);
 }
 
 
-static void ProcOnJoin(BN_PInfo I, const char Chan[], const char Who[])
+static void ProcOnJoin(irc_session_t *S, const char *event, const char *origin, const char **params, unsigned int count)
 {
-    string nickname = ExtractNick(Who);
-    string hostname = ExtractHost(Who);
-    string username = ExtractExactUserName(Who);
+    string nickname = ExtractNick(origin);
+    string hostname = ExtractHost(origin);
 
-    cout << "(" << Chan << ") " << nickname << " (" << username << "@" << hostname
+    const char *Chan = params[0];
+
+    cout << "(" << Chan << ") " << nickname << " (" << hostname
          << ") has joined the channel\n";
 
-    DoChanTalk(I, hostname, nickname, nickname.c_str(), Chan);
+    DoChanTalk(S, hostname, nickname, nickname.c_str(), Chan);
 }
 
 
-static void ProcOnPart(BN_PInfo I, const char Chan[], const char Who[],
-                const char Msg[])
+static void ProcOnPart(irc_session_t *S, const char *event, const char *origin, const char **params, unsigned int count)
 {
-    string nickname = ExtractNick(Who);
-    string hostname = ExtractHost(Who);
-    string username = ExtractExactUserName(Who);
+    string nickname = ExtractNick(origin);
+    string hostname = ExtractHost(origin);
 
-    cout << "(" << Chan << ") " << nickname << " (" << username << "@" << hostname
+    const char *Chan = params[0];
+    const char *Msg = params[1];
+
+    cout << "(" << Chan << ") " << nickname << " (" << hostname
          << ") has left the channel the channel (" << Msg << ")\n";
 
-    DoChanTalk(I, hostname, nickname, Msg, Chan);
+    DoChanTalk(S, hostname, nickname, Msg, Chan);
 }
 
 
-static void ProcOnQuit(BN_PInfo I, const char Who[], const char Msg[])
+static void ProcOnQuit(irc_session_t *S, const char *event, const char *origin, const char **params, unsigned int count)
 {
-    string nickname = ExtractNick(Who);
-    string hostname = ExtractHost(Who);
-    string username = ExtractExactUserName(Who);
+    string nickname = ExtractNick(origin);
+    string hostname = ExtractHost(origin);
 
-    cout << "" << nickname << " (" << username << "@" << hostname
+    const char *Chan = params[0];
+    const char *Msg = params[1];
+
+    cout << "" << nickname << " (" << hostname
          << ") has quit IRC (" << Msg << ")\n";
+
+    DoChanTalk(S, hostname, nickname, Msg, Chan);
 }
 
 // Main Body
@@ -318,9 +285,9 @@ void cleanup(void)
 {
     if (cleanedup) return;
     cleanedup = true;
-    if (connected) {
+    if (irc_is_connected(Session)) {
         cout << "Disconnecting from server...\n";
-        BN_SendQuitMessage(&Info, botsettings.quitmessage.c_str());
+        irc_cmd_quit(Session, botsettings.quitmessage.c_str());
     }
     cout << "Saving dictionary...\n";
     gSeeBorg.SaveSettings();
@@ -335,12 +302,7 @@ static void sig_term(int i)
         cleanup();
         signal(SIGINT, SIG_DFL);
         signal(SIGTERM, SIG_DFL);
-#ifndef _WIN32
-        // Windows doesn't define these signals
-        signal(SIGQUIT, SIG_DFL);
-        signal(SIGHUP, SIG_DFL);
-#endif
-        _exit(0);
+        exit(0);
     }
 }
 
@@ -350,7 +312,7 @@ int main(int argc, char *argv[])
     setlocale(LC_ALL, "");
 
     cout << "SeeBorg v" SEEBORGVERSIONSTRING
-           ", copyright (C) 2003 Eugene Bujak.\n" "Uses " << BN_GetCopyright() << "\n";
+           ", copyright (C) 2003 Eugene Bujak.\n";
 
     LoadBotSettings();
     if (argc < 2) {
@@ -363,21 +325,21 @@ int main(int argc, char *argv[])
         botsettings.server = argv[1];
     }
 
-    memset(&Info, 0, sizeof(Info));
+    irc_callbacks_t calls;
 
-    Info.CB.OnConnected = ProcOnConnected;
-    Info.CB.OnRegistered = ProcOnRegistered;
-    Info.CB.OnCTCP = ProcOnCTCP;
-    Info.CB.OnInvite = ProcOnInvite;
-    Info.CB.OnKick = ProcOnKick;
-    Info.CB.OnPrivateTalk = ProcOnPrivateTalk;
-    Info.CB.OnAction = ProcOnAction;
-    Info.CB.OnJoin = ProcOnJoin;
-    Info.CB.OnPart = ProcOnPart;
-    Info.CB.OnQuit = ProcOnQuit;
-    Info.CB.OnChannelTalk = ProcOnChannelTalk;
-    Info.CB.OnPingPong = ProcOnPingPong;
+    memset(&calls, 0, sizeof(calls));
 
+    calls.event_connect = ProcOnConnected;
+    calls.event_invite = ProcOnInvite;
+    calls.event_kick = ProcOnKick;
+    calls.event_join = ProcOnJoin;
+    calls.event_part = ProcOnPart;
+    calls.event_quit = ProcOnQuit;
+    calls.event_channel = ProcOnChannelTalk;
+    calls.event_privmsg = ProcOnPrivateTalk;
+    calls.event_ctcp_action = ProcOnAction;
+
+    Session = irc_create_session(&calls);
 
     srand(time(NULL));
     cout << "Loading dictionary...\n";
@@ -395,13 +357,11 @@ int main(int argc, char *argv[])
     cleanedup = false;
     atexit(cleanup);
 
-    while (BN_Connect(&Info, botsettings.server.c_str(), 6667, 0) != true) {
+    while (!irc_connect(Session, botsettings.server.c_str(), 6667, 0, botsettings.nickname.c_str(),
+                botsettings.username.c_str(), botsettings.realname.c_str())) {
+        irc_run(Session);
         cout << "Disconnected.\n";
-#ifdef __unix__
         sleep(10);
-#elif defined(_WIN32)
-        Sleep(10 * 1000);
-#endif
         cout << "Reconnecting...\n";
     }
     return 0;

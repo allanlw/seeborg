@@ -41,7 +41,7 @@ static string CMD_Join_f(class SeeBorg *self, const vector<string>& toks)
 
     for (int i = 1, sz = toks.size(); i < sz; i++) {
         cout << "Joining " << toks[i] << "...\n";
-        BN_SendJoinMessage(&Info, toks[i].c_str(), NULL);
+        irc_cmd_join(Session, toks[i].c_str(), NULL);
         botsettings.channels.insert(toks[i]);
     }
 
@@ -56,7 +56,7 @@ static string CMD_Part_f(class SeeBorg *self, const vector<string>& toks)
 
     for (int i = 1, sz = toks.size(); i < sz; i++) {
         cout << "Leaving " << toks[i] << "...\n";
-        BN_SendPartMessage(&Info, toks[i].c_str(), NULL);
+        irc_cmd_part(Session, toks[i].c_str());
 
         if (botsettings.channels.find(toks[i]) !=
                 botsettings.channels.end()) {
