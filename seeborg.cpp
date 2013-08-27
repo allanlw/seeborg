@@ -20,8 +20,7 @@ void SeeBorg::getIKnow(std::ostream& out) const {
     out << " per word), " << lines.size() << " lines.";
 }
 
-bool SeeBorg::LoadSettings()
-{
+bool SeeBorg::LoadSettings() {
     // TODO: WIP
     ifstream ifs(LINES_TXT);
     if (ifs.bad()) {
@@ -42,8 +41,7 @@ bool SeeBorg::LoadSettings()
     return true;
 }
 
-bool SeeBorg::SaveSettings()
-{
+bool SeeBorg::SaveSettings() {
     ofstream ofs(LINES_TXT);
     for (auto &line : lines) {
         ofs << line << endl;
@@ -96,8 +94,32 @@ static int fetchRandomContext(word_t& w, vector<string>& cwords) {
     return l.second;
 }
 
-string SeeBorg::Reply(string message)
-{
+static void buildLeftRight(SeeBorg &self, deque<string> &sentence, bool left) {
+    auto &words = self.words;
+    while (true) {
+        auto it = words.find(left ? sentence.front() : sentence.back());
+        if (it == words.end()) {
+            cout << "!! words.find(" << (left ? "first" : "last")
+                 << " == words.end()\n";
+            return;
+        }
+
+        vector<string> cwords;
+        int w = fetchRandomContext(it->second, cwords);
+
+        for (int i = 1, depth = self.getRandDepth(); i <= depth; i++) {
+            if (left) {
+                if (w - i < 0) return;
+                sentence.push_front(cwords[w - i]);
+            } else {
+                if (w + i >= cwords.size()) return;
+                sentence.push_back(cwords[w + i]);
+            }
+        }
+    }
+}
+
+string SeeBorg::Reply(string message) {
     FilterMessage(message);
 
     vector<string> curlines;
@@ -113,60 +135,16 @@ string SeeBorg::Reply(string message)
     }
 
     deque<string> sentence;
-    // pick a random word to start building the reply
     sentence.push_back(choosePivot(curwords));
 
-    // Build on the left edge
-    bool done = false;
-    while (!done) {
-        auto &first = sentence.front();
-        // cline = line, w = word number
-        if (words.find(first) == words.end()) {
-            cout << "!! words.find(first) == words.end()\n";
-            break;
-        }
-
-        vector<string> cwords;
-        int w = fetchRandomContext(words[first], cwords);
-
-        for (int i = 1, depth = getRandDepth(); i <= depth; i++) {
-            if ((w - i) < 0) {
-                done = true;
-                break;
-            }
-
-            sentence.push_front(cwords[w - i]);
-        }
-    }
-
-    // Build on the right edge
-    done = false;
-    while (!done) {
-        auto &last = sentence.back();
-        if (words.find(last) == words.end()) {
-            cout << "!! words.find(last) == words.end()\n";
-            break;
-        }
-
-        vector<string> cwords;
-        int w = fetchRandomContext(words[last], cwords);
-
-        for (int i = 1, depth = getRandDepth(); i <= depth; i++) {
-            if ((w + i) >= cwords.size()) {
-                done = true;
-                break;
-            }
-
-            sentence.push_back(cwords[w + i]);
-        }
-    }
+    buildLeftRight(*this, sentence, true);
+    buildLeftRight(*this, sentence, false);
 
     return joinString(sentence);
 }
 
 
-int SeeBorg::Learn(string &body)
-{
+int SeeBorg::Learn(string &body) {
     FilterMessage(body);
     vector<string> curlines;
     splitString(body, curlines, LINE_SEP);
@@ -178,8 +156,7 @@ int SeeBorg::Learn(string &body)
     return true;
 }
 
-int SeeBorg::LearnLine(string &line)
-{
+int SeeBorg::LearnLine(string &line) {
     // Ignore quotes
     if (isdigit(line[0]) || line[0] == '<' || line[0] == '[') {
         return false;
@@ -211,8 +188,7 @@ int SeeBorg::LearnLine(string &line)
 }
 
 
-string SeeBorg::ParseCommands(const string& cmd)
-{
+string SeeBorg::ParseCommands(const string& cmd) {
     if (cmd[0] != '!') {
         return "";
     }
@@ -246,8 +222,7 @@ static const replacement msg_filters[] = {
 
 // Utility
 // ---
-int SeeBorg::FilterMessage(string &message)
-{
+int SeeBorg::FilterMessage(string &message) {
     for (auto &r : msg_filters) {
         for (int n = message.find(r.needle); n != message.npos;
                 n = message.find(r.needle, n)) {
@@ -270,11 +245,8 @@ int SeeBorg::FilterMessage(string &message)
     return true;
 }
 
-SeeBorg::SeeBorg() {
-    num_contexts = 0;
-    min_context_depth = 1;
-    max_context_depth = 4;
-
+SeeBorg::SeeBorg() : num_contexts(0), min_context_depth(1),
+      max_context_depth(4) {
     AddDefaultCommands();
 }
 

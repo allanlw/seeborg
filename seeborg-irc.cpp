@@ -14,9 +14,10 @@
 using namespace std;
 
 // Variables// ---------------------------------------------------------------------------
-SeeBorg gSeeBorg;
 irc_session_t *Session;
-bool cleanedup = false;
+
+static SeeBorg gSeeBorg;
+static bool cleanedup = false;
 
 // Hacky mackro to define functions that do extraction of the params
 #define DefExtract(X, Y) \
