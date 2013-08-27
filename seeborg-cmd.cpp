@@ -4,8 +4,7 @@
 
 using namespace std;
 
-static string CMD_Help_f(class SeeBorg *self, const vector<string>& toks)
-{
+static string CMD_Help_f(class SeeBorg *self, const vector<string>& toks) {
     stringstream ss;
     ss << "SeeBorg commands:\n";
     for (auto &cmd : self->cmds) {
@@ -14,21 +13,18 @@ static string CMD_Help_f(class SeeBorg *self, const vector<string>& toks)
     return ss.str();
 }
 
-static string CMD_Version_f(class SeeBorg *self, const vector<string>& toks)
-{
+static string CMD_Version_f(class SeeBorg *self, const vector<string>& toks) {
     return "I am SeeBorg v" SEEBORGVERSIONSTRING
            " by Eugene 'HMage' Bujak";
 }
 
-static string CMD_Words_f(class SeeBorg *self, const vector<string>& toks)
-{
+static string CMD_Words_f(class SeeBorg *self, const vector<string>& toks) {
     stringstream ss;
     self->getIKnow(ss);
     return ss.str();
 }
 
-static string CMD_Known_f(class SeeBorg *self, const vector<string>& toks)
-{
+static string CMD_Known_f(class SeeBorg *self, const vector<string>& toks) {
     if (toks.size() < 2) {
         return "Not enough parameters, usage: !known <word>";
     }
@@ -46,23 +42,19 @@ static string CMD_Known_f(class SeeBorg *self, const vector<string>& toks)
     return ss.str();
 }
 
-static string CMD_Contexts_f(class SeeBorg *self, const vector<string>& toks)
-{
+static string CMD_Contexts_f(class SeeBorg *self, const vector<string>& toks) {
     return "Not implemented yet";
 }
 
-static string CMD_Unlearn_f(class SeeBorg *self, const vector<string>& toks)
-{
+static string CMD_Unlearn_f(class SeeBorg *self, const vector<string>& toks) {
     return "Not implemented yet";
 }
 
-static string CMD_Replace_f(class SeeBorg *self, const vector<string>& toks)
-{
+static string CMD_Replace_f(class SeeBorg *self, const vector<string>& toks) {
     return "Not implemented yet";
 }
 
-static string CMD_Quit_f(class SeeBorg *self, const vector<string>& toks)
-{
+static string CMD_Quit_f(class SeeBorg *self, const vector<string>& toks) {
     exit(0);
 }
 
@@ -82,5 +74,4 @@ static const BotCommand botcmds[] = {
 
 void SeeBorg::AddDefaultCommands() {
     AddCommands(botcmds);
-
 }

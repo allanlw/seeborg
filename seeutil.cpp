@@ -9,8 +9,7 @@
 
 using namespace std;
 
-void tokenizeString(const string &instr, vector<string> &outtokens)
-{
+void tokenizeString(const string &instr, vector<string> &outtokens) {
     istringstream iss(instr);
     copy(istream_iterator<string>(iss),
          istream_iterator<string>(),
@@ -18,8 +17,7 @@ void tokenizeString(const string &instr, vector<string> &outtokens)
 }
 
 int splitString(string &instr, vector<string> &outtokens,
-                const char *needle)
-{
+                const char *needle) {
     vector<string::size_type> splitpos;
     for (string::size_type n = instr.find(needle); n != instr.npos;
             n = instr.find(needle, n)) {
@@ -46,28 +44,27 @@ int splitString(string &instr, vector<string> &outtokens,
     return i;
 }
 
-void lowerString(string &str)
-{
-    std::transform(str.begin(), str.end(), str.begin(), ptr_fun<int, int>(tolower));
+void lowerString(string &str) {
+    std::transform(str.begin(), str.end(), str.begin(),
+         ptr_fun<int, int>(tolower));
 }
 
-void lowerString(char *str)
-{
+void lowerString(char *str) {
     for (char *p = str; *p; p++) {
         *p = tolower(*p);
     }
 }
 
-void trimString(string &str)
-{
+void trimString(string &str) {
     // creds to http://stackoverflow.com/questions/216823/whats-the-best-way-to-trim-stdstring
     // do left trim then right trim
-    str.erase(str.begin(), find_if(str.begin(), str.end(), not1(ptr_fun<int, int>(isspace))));
-    str.erase(find_if(str.rbegin(), str.rend(), not1(ptr_fun<int, int>(isspace))).base(), str.end());
+    str.erase(str.begin(), find_if(str.begin(), str.end(),
+        not1(ptr_fun<int, int>(isspace))));
+    str.erase(find_if(str.rbegin(), str.rend(),
+        not1(ptr_fun<int, int>(isspace))).base(), str.end());
 }
 
-vector<string> CMA_TokenizeString(const string& str)
-{
+vector<string> CMA_TokenizeString(const string& str) {
     vector<string> res;
 
     size_t i = 0, j = 0;

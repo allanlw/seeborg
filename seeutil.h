@@ -7,25 +7,21 @@
 #include <cmath>
 #include <cstring>
 
-inline float randFloat(float min, float max)
-{
+inline float randFloat(float min, float max) {
     float retval = (float) std::rand() / (float) RAND_MAX;
-    retval *= (max - min);
-    retval += min;
-    return retval;
+    return retval * (max - min) + min;
 }
 
-inline int randInt(int min, int max)
-{
-    return (int) roundf(randFloat(min,max));
+inline int randInt(int min, int max) {
+    return std::rand() % (max - min) + min;
 }
 
 void tokenizeString(const std::string &str, std::vector<std::string> &tokens);
 int splitString(std::string &str, std::vector<std::string> &tokens,
                 const char *needle);
+
 template <class T>
-std::string joinString(T &tokens)
-{
+std::string joinString(T &tokens) {
     std::string str;
 
     int sz = tokens.size();
@@ -49,5 +45,10 @@ inline bool equalIString(const std::string &a, const std::string &b) {
 
 // Arguments from string
 std::vector<std::string> CMA_TokenizeString(const std::string& str);
+
+template <class Z>
+Z& getRandom(std::vector<Z>& container) {
+    return container[rand() % container.size()];
+}
 
 #endif

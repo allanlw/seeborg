@@ -22,8 +22,7 @@ struct BotCommand {
 typedef std::pair<std::set<std::string>::iterator, int> context_t;
 typedef std::vector<context_t> word_t;
 
-class SeeBorg
-{
+class SeeBorg {
 public:
     SeeBorg();
 

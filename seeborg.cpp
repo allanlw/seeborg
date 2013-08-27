@@ -50,11 +50,6 @@ bool SeeBorg::SaveSettings() {
     return true;
 }
 
-template <class Z>
-Z& getRandom(std::vector<Z>& container) {
-    return container[rand() % container.size()];
-}
-
 string SeeBorg::choosePivot(vector<string>& curwords) {
     // Filter out the words we don't know about
     // EDIT: this actually chooses the words in the index that
@@ -88,12 +83,6 @@ int SeeBorg::getRandDepth() {
         min_context_depth;
 }
 
-static int fetchRandomContext(word_t& w, vector<string>& cwords) {
-    context_t l = getRandom(w);
-    tokenizeString(*(l.first), cwords);
-    return l.second;
-}
-
 static void buildLeftRight(SeeBorg &self, deque<string> &sentence, bool left) {
     auto &words = self.words;
     while (true) {
@@ -105,7 +94,9 @@ static void buildLeftRight(SeeBorg &self, deque<string> &sentence, bool left) {
         }
 
         vector<string> cwords;
-        int w = fetchRandomContext(it->second, cwords);
+        context_t l = getRandom(it->second);
+        tokenizeString(*l.first, cwords);
+        int w = l.second;
 
         for (int i = 1, depth = self.getRandDepth(); i <= depth; i++) {
             if (left) {

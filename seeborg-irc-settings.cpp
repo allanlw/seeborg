@@ -52,8 +52,7 @@ static const ConfigSetting configsettings[] = {
 static const int numconfigsettings =
     sizeof(configsettings) / sizeof(configsettings[0]) - 1;
 
-void LoadBotSettings()
-{
+void LoadBotSettings() {
     string str;
     ifstream ifs("seeborg-irc.cfg");
     if (ifs.bad()) {
@@ -118,8 +117,7 @@ void LoadBotSettings()
     ifs.close();
 }
 
-void SaveBotSettings()
-{
+void SaveBotSettings() {
     FILE *f = fopen("seeborg-irc.cfg", "w");
     if (f == NULL) return;
 

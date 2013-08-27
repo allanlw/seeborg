@@ -13,7 +13,7 @@
 
 using namespace std;
 
-// Variables// ---------------------------------------------------------------------------
+// Variables
 irc_session_t *Session;
 
 static SeeBorg gSeeBorg;
@@ -32,8 +32,7 @@ DefExtract(Nick, nick)
 
 // Message processing
 // ---------------------------------------------------------------------------
-static void checkOwners(const string& hostname, const string& nickname)
-{
+static void checkOwners(const string& hostname, const string& nickname) {
     for (auto &owner : botsettings.owners) {
         if (owner.hostname.empty() && equalIString(nickname, owner.nickname)) {
             owner.hostname = hostname;
@@ -44,8 +43,7 @@ static void checkOwners(const string& hostname, const string& nickname)
     }
 }
 
-static bool isOwner(const string& hostname, const string& nickname)
-{
+static bool isOwner(const string& hostname, const string& nickname) {
     for (auto &owner : botsettings.owners) {
         if (equalIString(hostname, owner.hostname) &&
             equalIString(nickname, owner.nickname)) {
@@ -57,8 +55,7 @@ static bool isOwner(const string& hostname, const string& nickname)
 
 
 static string ProcessMessage(const string &hostname,
-        const string &nickname, const char msg[], bool replying = false)
-{
+        const string &nickname, const char msg[], bool replying = false) {
     string stdmessage = msg;
     lowerString(stdmessage);
 
@@ -121,24 +118,29 @@ static string ProcessMessage(const string &hostname,
 
 
 static void DoChanTalk(irc_session_t *S, const string& hostname,
-        const string &nickname, const char *Msg, const char *Chan) {
-    string reply = ProcessMessage(hostname, nickname, Msg);
+        const string &nickname, const char *Msg, const char *Chan,
+        bool priv = false) {
+    string reply = ProcessMessage(hostname, nickname, Msg, priv);
 
     if (reply.empty()) return;
 
     vector<string> curlines;
     splitString(reply, curlines, "\n");
     for (auto& str : curlines) {
-        cout << "(" << Chan << ") <" << botsettings.nickname << "> "
-             << str << "\n";
+        if (priv) {
+            cout << Chan << " -> " << botsettings.nickname << ": ";
+        } else {
+            cout << "(" << Chan << ") <" << botsettings.nickname << "> ";
+        }
+        cout << str << "\n";
         irc_cmd_msg(S, Chan, str.c_str());
     }
 }
 
 // BotNet callback functions
 // ---------------------------------------------------------------------------
-static void ProcOnConnected(irc_session_t *S, const char *event, const char *origin, const char **params, unsigned int count)
-{
+static void ProcOnConnected(irc_session_t *S, const char *event,
+        const char *origin, const char **params, unsigned int count) {
     cout << "Connected...\n";
 
     for (auto &cname : botsettings.channels) {
@@ -147,11 +149,12 @@ static void ProcOnConnected(irc_session_t *S, const char *event, const char *ori
     }
 }
 
-static void ProcOnInvite(irc_session_t *S, const char *event, const char *origin, const char **params, unsigned int count)
-{
+static void ProcOnInvite(irc_session_t *S, const char *event,
+        const char *origin, const char **params, unsigned int count) {
     string nickname = ExtractNick(origin);
     string hostname = ExtractHost(origin);
     const char *Chan = params[1];
+
     cout << "Received invitation to " << Chan << " by " << nickname << "\n";
 
     if (botsettings.joininvites) {
@@ -166,8 +169,8 @@ static void ProcOnInvite(irc_session_t *S, const char *event, const char *origin
 }
 
 
-static void ProcOnKick(irc_session_t *S, const char *event, const char *origin, const char **params, unsigned int count)
-{
+static void ProcOnKick(irc_session_t *S, const char *event,
+        const char *origin, const char **params, unsigned int count) {
     string nickname = ExtractNick(origin);
     const char *Chan = params[0];
     const char *Msg = params[2];
@@ -182,32 +185,22 @@ static void ProcOnKick(irc_session_t *S, const char *event, const char *origin, 
 }
 
 
-static void ProcOnPrivateTalk(irc_session_t *S, const char *event, const char *origin, const char **params, unsigned int count)
-{
+static void ProcOnPrivateTalk(irc_session_t *S, const char *event,
+        const char *origin, const char **params, unsigned int count) {
     string nickname = ExtractNick(origin);
     string hostname = ExtractHost(origin);
     const char *Msg = params[1];
 
     cout << nickname << ": " << Msg << "\n";
 
-    string reply = ProcessMessage(hostname, nickname, Msg, true);
-
-    if (!reply.empty()) {
-        vector<string> curlines;
-        splitString(reply, curlines, "\n");
-        for (int i = 0, sz = curlines.size(); i < sz; i++) {
-            cout << origin << " -> " << nickname << ": " << reply << "\n";
-            irc_cmd_msg(S, nickname.c_str(), curlines[i].c_str());
-        }
-    }
+    DoChanTalk(S, hostname, nickname, Msg, origin, true);
 }
 
 
-static void ProcOnChannelTalk(irc_session_t *S, const char *event, const char *origin, const char **params, unsigned int count)
-{
+static void ProcOnChannelTalk(irc_session_t *S, const char *event,
+        const char *origin, const char **params, unsigned int count) {
     string nickname = ExtractNick(origin);
     string hostname = ExtractHost(origin);
-
     const char *Chan = params[0];
     const char *Msg = params[1];
 
@@ -217,13 +210,12 @@ static void ProcOnChannelTalk(irc_session_t *S, const char *event, const char *o
 }
 
 
-static void ProcOnAction(irc_session_t *S, const char *event, const char *origin, const char **params, unsigned int count)
-{
+static void ProcOnAction(irc_session_t *S, const char *event,
+        const char *origin, const char **params, unsigned int count) {
     string nickname = ExtractNick(origin);
     string hostname = ExtractHost(origin);
-
     const char *Msg = params[0];
-    const char *Chan = params[1]; //?
+    const char *Chan = params[1]; //? not specified in documentation
 
     string action = nickname + " " + Msg;
 
@@ -233,11 +225,10 @@ static void ProcOnAction(irc_session_t *S, const char *event, const char *origin
 }
 
 
-static void ProcOnJoin(irc_session_t *S, const char *event, const char *origin, const char **params, unsigned int count)
-{
+static void ProcOnJoin(irc_session_t *S, const char *event,
+        const char *origin, const char **params, unsigned int count) {
     string nickname = ExtractNick(origin);
     string hostname = ExtractHost(origin);
-
     const char *Chan = params[0];
 
     cout << "(" << Chan << ") " << nickname << " (" << hostname
@@ -247,11 +238,10 @@ static void ProcOnJoin(irc_session_t *S, const char *event, const char *origin, 
 }
 
 
-static void ProcOnPart(irc_session_t *S, const char *event, const char *origin, const char **params, unsigned int count)
-{
+static void ProcOnPart(irc_session_t *S, const char *event,
+        const char *origin, const char **params, unsigned int count) {
     string nickname = ExtractNick(origin);
     string hostname = ExtractHost(origin);
-
     const char *Chan = params[0];
     const char *Msg = params[1];
 
@@ -262,11 +252,10 @@ static void ProcOnPart(irc_session_t *S, const char *event, const char *origin, 
 }
 
 
-static void ProcOnQuit(irc_session_t *S, const char *event, const char *origin, const char **params, unsigned int count)
-{
+static void ProcOnQuit(irc_session_t *S, const char *event,
+        const char *origin, const char **params, unsigned int count) {
     string nickname = ExtractNick(origin);
     string hostname = ExtractHost(origin);
-
     const char *Chan = params[0];
     const char *Msg = params[1];
 
@@ -324,7 +313,6 @@ int main(int argc, char *argv[])
     }
 
     irc_callbacks_t calls;
-
     memset(&calls, 0, sizeof(calls));
 
     calls.event_connect = ProcOnConnected;
