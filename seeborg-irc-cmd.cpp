@@ -7,6 +7,8 @@
 #include <fstream>
 #include <cstring>
 #include <iostream>
+#include <sstream>
+#include <iomanip>
 
 #include "seeborg-irc.h"
 #include "seeutil.h"
@@ -69,38 +71,37 @@ static string CMD_Part_f(SeeBorg *self, const vector<string>& toks)
 
 static string CMD_Replyrate_f(SeeBorg *self, const vector<string>& toks)
 {
-    char retstr[4096];
+    stringstream ss;
     if (toks.size() >= 2) {
         botsettings.replyrate = atof(toks[1].c_str());
     }
-
-    snprintf(retstr, 4096, "Reply rate is set to %.1f%%",
-             botsettings.replyrate);
-    return retstr;
+    ss << "Reply rate is set to ";
+    ss << fixed << setprecision(1) << botsettings.replyrate << "%";
+    return ss.str();
 }
 
 static string CMD_Replynick_f(SeeBorg *self, const vector<string>& toks)
 {
-    char retstr[4096];
+    stringstream ss;
     if (toks.size() >= 2) {
         botsettings.replyrate_mynick = atof(toks[1].c_str());
     }
 
-    snprintf(retstr, 4096, "Reply rate to nickname is set to %.1f%%",
-             botsettings.replyrate_mynick);
-    return retstr;
+    ss << "Reply rate to nickname is set to ";
+    ss << fixed << setprecision(1) << botsettings.replyrate_mynick << "%";
+    return ss.str();
 }
 
 static string CMD_Replyword_f(SeeBorg *self, const vector<string>& toks)
 {
-    char retstr[4096];
+    stringstream ss;
     if (toks.size() >= 2) {
         botsettings.replyrate_magic = atof(toks[1].c_str());
     }
 
-    snprintf(retstr, 4096, "Reply rate to magic words is set to %.1f%%",
-             botsettings.replyrate_magic);
-    return retstr;
+    ss << "Reply rate to magic words is set to ";
+    ss << fixed << setprecision(1) << botsettings.replyrate_magic << "%";
+    return ss.str();
 }
 
 static string CMD_Learning_f(SeeBorg *self, const vector<string>& toks)

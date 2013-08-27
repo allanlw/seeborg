@@ -23,7 +23,22 @@ inline int randInt(int min, int max)
 void tokenizeString(const std::string &str, std::vector<std::string> &tokens);
 int splitString(std::string &str, std::vector<std::string> &tokens,
                 const char *needle);
-std::string joinString(std::vector<std::string> &tokens);
+template <class T>
+std::string joinString(T &tokens)
+{
+    std::string str;
+
+    int sz = tokens.size();
+    for (int i = 0; i < sz-1; i++) {
+        str += tokens[i];
+        if (i + 1 != sz) {
+            str += ' ';
+        }
+    }
+
+    return str;
+}
+
 void lowerString(std::string &str);
 void lowerString(char *str);
 void trimString(std::string &str);

@@ -46,21 +46,6 @@ int splitString(string &instr, vector<string> &outtokens,
     return i;
 }
 
-string joinString(vector<string> &tokens)
-{
-    string str;
-
-    int sz = tokens.size();
-    for (int i = 0; i < sz; i++) {
-        str += tokens[i];
-        if (i + 1 != sz) {
-            str += ' ';
-        }
-    }
-
-    return str;
-}
-
 void lowerString(string &str)
 {
     std::transform(str.begin(), str.end(), str.begin(), ptr_fun<int, int>(tolower));

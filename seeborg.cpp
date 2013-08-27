@@ -1,5 +1,8 @@
 #include <fstream>
 #include <deque>
+#include <sstream>
+#include <iostream>
+#include <iomanip>
 
 #include "seeborg.h"
 #include "seeutil.h"
@@ -9,31 +12,37 @@
 
 using namespace std;
 
-int SeeBorg::LoadSettings(void)
+void SeeBorg::getIKnow(std::ostream& out) const {
+    float ctxperword = (float)num_contexts / words.size();
+
+    out << "I know " << words.size() << " words (" << num_contexts;
+    out << " contexts, " << fixed << setprecision(2) << ctxperword;
+    out << " per word), " << lines.size() << " lines.";
+}
+
+int SeeBorg::LoadSettings()
 {
     // TODO: WIP
-    string str;
     ifstream ifs(LINES_TXT);
     if (ifs.bad()) {
-        printf("Not found, creating dictionary.\n");
+        cout << "Not found, creating dictionary.\n";
         return false;
     }
 
+    string str;
     while (getline(ifs, str)) {
-        this->Learn(str);
+        Learn(str);
     }
 
     ifs.close();
 
-    printf("Parsed %i lines.\n", lines.size());
-    printf("I know %i words (%i contexts, %.2f per word), %i lines.\n",
-           words.size(), num_contexts,
-           (float) num_contexts / (float) words.size(), lines.size());
+    cout << "Parsed " << lines.size() << " lines.\n";
+    getIKnow(cout);
 
     return true;
 }
 
-int SeeBorg::SaveSettings(void)
+int SeeBorg::SaveSettings()
 {
     ofstream ofs(LINES_TXT);
     for (auto &line : lines) {
@@ -43,23 +52,15 @@ int SeeBorg::SaveSettings(void)
     return true;
 }
 
-string SeeBorg::Reply(string message)
-{
-    FilterMessage(message);
-    string replystring;
+template <class Z>
+Z& getRandom(std::vector<Z>& container) {
+    return container[rand() % container.size()];
+}
 
-    vector<string> curlines;
-    splitString(message, curlines, LINE_SEP);
-    vector<string> curwords;
-
-    for (auto &line : lines) {
-        tokenizeString(line, curwords);
-    }
-
-    if (curwords.empty()) {
-        return replystring;
-    }
+string SeeBorg::choosePivot(vector<string>& curwords) {
     // Filter out the words we don't know about
+    // EDIT: this actually chooses the words in the index that
+    // have contexts, but the least number of contexts
     int known = -1;
     vector<string> index;
     for (auto &x : curwords) {
@@ -78,76 +79,89 @@ string SeeBorg::Reply(string message)
     }
 
     if (index.empty()) {
-        return replystring;
+        return "";
+    }
+
+    return getRandom(index);
+}
+
+int SeeBorg::getRandDepth() {
+    return rand() % (max_context_depth - min_context_depth) +
+        min_context_depth;
+}
+
+static int fetchRandomContext(word_t& w, vector<string>& cwords) {
+    context_t l = getRandom(w);
+    tokenizeString(*(l.first), cwords);
+    return l.second;
+}
+
+string SeeBorg::Reply(string message)
+{
+    FilterMessage(message);
+
+    vector<string> curlines;
+    splitString(message, curlines, LINE_SEP);
+    vector<string> curwords;
+
+    for (auto &line : lines) {
+        tokenizeString(line, curwords);
+    }
+
+    if (curwords.empty()) {
+        return "";
     }
 
     deque<string> sentence;
-
     // pick a random word to start building the reply
-    int x = rand() % (index.size());
-    sentence.push_back(index[x]);
+    sentence.push_back(choosePivot(curwords));
 
     // Build on the left edge
     bool done = false;
     while (!done) {
+        auto &first = sentence.front();
         // cline = line, w = word number
-        int c = this->words[sentence[0]].size();
-        context_t l = this->words[sentence[0]][rand() % (c)];
-        int w = l.second;
-        vector<string> cwords;
-        tokenizeString(*(l.first), cwords);
+        if (words.find(first) == words.end()) {
+            cout << "!! words.find(first) == words.end()\n";
+            break;
+        }
 
-        int depth =
-            rand() % (max_context_depth - min_context_depth) +
-            min_context_depth;
-        for (int i = 1; i <= depth; i++) {
+        vector<string> cwords;
+        int w = fetchRandomContext(words[first], cwords);
+
+        for (int i = 1, depth = getRandDepth(); i <= depth; i++) {
             if ((w - i) < 0) {
                 done = true;
                 break;
-            } else {
-                sentence.push_front(cwords[w - i]);
             }
-            if ((w - i) == 0) {
-                done = true;
-                break;
-            }
+
+            sentence.push_front(cwords[w - i]);
         }
     }
 
     // Build on the right edge
     done = false;
     while (!done) {
-        if (words.find(sentence.back()) == words.end()) {
-            printf("%s:%i: words.find(sentence.back()) == words.end()\n",
-                   __FILE__, __LINE__);
+        auto &last = sentence.back();
+        if (words.find(last) == words.end()) {
+            cout << "!! words.find(last) == words.end()\n";
+            break;
         }
 
-        int c = this->words[sentence.back()].size();
-        context_t l = this->words[sentence.back()][rand() % (c)];
-        int w = l.second;
         vector<string> cwords;
-        tokenizeString(*(l.first), cwords);
+        int w = fetchRandomContext(words[last], cwords);
 
-        int depth =
-            rand() % (max_context_depth - min_context_depth) +
-            min_context_depth;
-        for (int i = 1; i <= depth; i++) {
+        for (int i = 1, depth = getRandDepth(); i <= depth; i++) {
             if ((w + i) >= cwords.size()) {
                 done = true;
                 break;
-            } else {
-                sentence.push_back(cwords[w + i]);
             }
+
+            sentence.push_back(cwords[w + i]);
         }
     }
 
-    for (int i = 0, sz = sentence.size() - 1; i < sz; i++) {
-        replystring += sentence[i];
-        replystring += ' ';
-    }
-    replystring += sentence.back();
-
-    return replystring;
+    return joinString(sentence);
 }
 
 
@@ -180,18 +194,15 @@ int SeeBorg::LearnLine(string &line)
 
     set<string>::iterator lineit = lines.insert(cleanline).first;
 
-    int sz = curwords.size();
-    for (int i = 0; i < sz; i++) {
+    for (int i = 0, sz = curwords.size(); i < sz; i++) {
         auto &word = curwords[i];
-        map<string, word_t>::iterator wit = words.find(word);
+        auto wit = words.find(word);
         if (wit == words.end()) {
             word_t cword;
-            context_t cxt(lineit, i);
-            cword.push_back(cxt);
+            cword.emplace_back(lineit, i);
             words[word] = cword;
         } else {
-            context_t cxt(lineit, i);
-            wit->second.push_back(cxt);
+            wit->second.emplace_back(lineit, i);
         }
         num_contexts++;
     }
@@ -220,46 +231,40 @@ string SeeBorg::ParseCommands(const string& cmd)
     return "";
 }
 
+struct replacement {
+  const char *needle;
+  const char *repl;
+};
+
+static const replacement msg_filters[] = {
+    {"\n", ""},
+    {"\r", ""},
+    {"\"", ""},
+    {"?", "?."},
+    {"!", "!."},
+};
+
 // Utility
 // ---
 int SeeBorg::FilterMessage(string &message)
 {
-    char del[] = {'\n', '\r', '\"'};
-    int n;
-    for (char d : del) {
-        for (n = message.find(d); n != message.npos;
-                n = message.find(d, n)) {
-            message.erase(n, 1);
+    for (auto &r : msg_filters) {
+        for (int n = message.find(r.needle); n != message.npos;
+                n = message.find(r.needle, n)) {
+            message.replace(n, strlen(r.needle), r.repl);
         }
-    }
-
-    for (n = message.find("?"); n != message.npos;
-            n = message.find("?", n)) {
-        message.replace(n, 1, "?.");
-        n++;
-    }
-
-    for (n = message.find("!"); n != message.npos;
-            n = message.find("!", n)) {
-        message.replace(n, 1, "!.");
-        n++;
     }
 
     // Remove message start text in the form NICK: from the start
-    if ((n = message.find(':')) != string::npos) {
-        bool fail = false;
-        for (int i = 0; i < n; i++) {
-            if (!isalnum(message[i]) && message[i] != '_' &&
-                message[i] != '-') {
-                fail = true;
-                break;
-            }
+    for (int i = 0, sz = message.size(); i != sz; i++) {
+        if (isalnum(message[i]) || message[i] == '_' || message[i] == '-') {
+            continue;
         }
-        if (!fail) {
-            message.erase(0, n+1);
+        if (message[i] == ':') {
+            message.erase(0, i+1);
         }
+        break;
     }
-
     lowerString(message);
 
     return true;
@@ -269,12 +274,12 @@ int SeeBorg::FilterMessage(string &message)
 
 string CMD_Help_f(class SeeBorg *self, const vector<string>& toks)
 {
-    string retstr = "SeeBorg commands:\n";
+    stringstream ss;
+    ss << "SeeBorg commands:\n";
     for (auto &cmd : self->cmds) {
-        retstr += "!" + cmd.command + ": ";
-        retstr += cmd.description + "\n";
+        ss << "!" << cmd.command << ": " << cmd.description << "\n";
     }
-    return retstr;
+    return ss.str();
 }
 
 string CMD_Version_f(class SeeBorg *self, const vector<string>& toks)
@@ -285,14 +290,9 @@ string CMD_Version_f(class SeeBorg *self, const vector<string>& toks)
 
 string CMD_Words_f(class SeeBorg *self, const vector<string>& toks)
 {
-    char retstr[4096];
-
-    snprintf(retstr, 4096,
-             "I know %i words (%i contexts, %.2f per word), %i lines.",
-             self->words.size(), self->num_contexts,
-             self->num_contexts / (float) self->words.size(),
-             self->lines.size());
-    return retstr;
+    stringstream ss;
+    self->getIKnow(ss);
+    return ss.str();
 }
 
 string CMD_Known_f(class SeeBorg *self, const vector<string>& toks)
@@ -303,16 +303,15 @@ string CMD_Known_f(class SeeBorg *self, const vector<string>& toks)
 
     const string& lookup = toks[1];
 
+    stringstream ss;
+
     map<string, word_t>::iterator wit = self->words.find(lookup);
     if (wit != self->words.end()) {
-        char retstr[4096];
-        int wordcontexts = ((*wit).second).size();
-        snprintf(retstr, 4096, "%s is known (%i contexts)", lookup.c_str(),
-                 wordcontexts);
-        return retstr;
+        ss << lookup << " is known in " << wit->second.size() << " contexts.";
     } else {
-        return lookup + " is unknown";
+        ss << lookup << " is not known.";
     }
+    return ss.str();
 }
 
 string CMD_Contexts_f(class SeeBorg *self, const vector<string>& toks)
@@ -364,4 +363,3 @@ void SeeBorg::AddCommands(const BotCommand *cmds) {
     this->cmds.push_back(cmds[i]);
   }
 }
-

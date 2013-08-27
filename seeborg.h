@@ -50,6 +50,11 @@ public:
     std::map<std::string, word_t> words;
 
     std::vector<BotCommand> cmds;
+
+    void getIKnow(std::ostream&) const;
+
+    std::string choosePivot(std::vector<std::string>&);
+    int getRandDepth();
 };
 
 #endif
