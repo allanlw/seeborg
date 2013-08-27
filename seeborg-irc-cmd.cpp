@@ -60,9 +60,9 @@ static string CMD_Part_f(SeeBorg *self, const vector<string>& toks)
         cout << "Leaving " << toks[i] << "...\n";
         irc_cmd_part(Session, toks[i].c_str());
 
-        if (botsettings.channels.find(toks[i]) !=
-                botsettings.channels.end()) {
-            botsettings.channels.erase(botsettings.channels.find(toks[i]));
+        auto chan = botsettings.channels.find(toks[i]);
+        if (chan != botsettings.channels.end()) {
+            botsettings.channels.erase(chan);
         }
     }
 

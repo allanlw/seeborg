@@ -62,13 +62,7 @@ void LoadBotSettings()
 
     while (getline(ifs, str)) {
         trimString(str);
-        if (str[0] == ';') {
-            continue;
-        }
-        if (str[0] == '#') {
-            continue;
-        }
-        if (str.empty()) {
+        if (str[0] == ';' || str[0] == '#' || str.empty()) {
             continue;
         }
 
@@ -80,40 +74,28 @@ void LoadBotSettings()
 
         trimString(cursetting[0]);
         trimString(cursetting[1]);
-        if (!strcasecmp(cursetting[0].c_str(), "channels")) {
-            vector<string> cursplit;
-            if (!splitString(cursetting[1], cursplit, " ")) {
-                continue;
-            }
-            botsettings.channels.clear();
-            for (auto &s : cursplit) {
-                lowerString(s);
-                botsettings.channels.insert(s);
-            }
-        }
 
-        if (!strcasecmp(cursetting[0].c_str(), "owners")) {
+        bool channels = (!strcasecmp(cursetting[0].c_str(), "channels"));
+        bool owners = (!strcasecmp(cursetting[0].c_str(), "owners"));
+        bool magicwords = (!strcasecmp(cursetting[0].c_str(), "magicwords"));
+        if (channels || owners || magicwords) {
             vector<string> cursplit;
             if (!splitString(cursetting[1], cursplit, " ")) {
                 continue;
             }
-            botsettings.owners.clear();
             for (auto &s : cursplit) {
-                IrcBotOwner ircbotowner;
-                ircbotowner.nickname = s;
-                botsettings.owners.push_back(ircbotowner);
+                if (channels) {
+                    lowerString(s);
+                    botsettings.channels.insert(s);
+                } else if (owners) {
+                    IrcBotOwner ircbotowner;
+                    ircbotowner.nickname = s;
+                    botsettings.owners.push_back(ircbotowner);
+                } else if (magicwords) {
+                    botsettings.magicwords.push_back(s);
+                }
             }
-        }
-
-        if (!strcasecmp(cursetting[0].c_str(), "magicwords")) {
-            vector<string> cursplit;
-            if (!splitString(cursetting[1], cursplit, " ")) {
-                continue;
-            }
-            botsettings.magicwords.clear();
-            for (auto &s : cursplit) {
-                botsettings.magicwords.push_back(s);
-            }
+            continue;
         }
 
         for (int i = 0; i < numconfigsettings; i++) {
@@ -139,14 +121,12 @@ void LoadBotSettings()
 void SaveBotSettings()
 {
     FILE *f = fopen("seeborg-irc.cfg", "w");
-    //  if (f == NULL) return;
+    if (f == NULL) return;
 
     fprintf(f,
             "; SeeBorg " SEEBORGVERSIONSTRING
             " settings file\n; Lines beginning with ; or # are treated as comments\n\n\n");
-    int i, sz;
-
-    for (i = 0; i < numconfigsettings; i++) {
+    for (int i = 0; i < numconfigsettings; i++) {
         const ConfigSetting *s = &configsettings[i];
         if (s->configline == NULL) {
             fprintf(f, "\n\n");
@@ -167,7 +147,6 @@ void SaveBotSettings()
     fprintf(f, "; Channel list to join to\n");
     fprintf(f, "channels =");
 
-    set<string>::iterator it = botsettings.channels.begin();
     for (auto &chan : botsettings.channels) {
         fprintf(f, " %s", chan.c_str());
     }
@@ -186,7 +165,6 @@ void SaveBotSettings()
         fprintf(f, " %s", owner.nickname.c_str());
     }
     fprintf(f, "\n");
-
 
     fclose(f);
 }

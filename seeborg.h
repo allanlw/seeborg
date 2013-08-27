@@ -30,8 +30,8 @@ public:
     int Learn(std::string &body);
     std::string Reply(std::string message);
 
-    int LoadSettings(void);
-    int SaveSettings(void);
+    bool LoadSettings();
+    bool SaveSettings();
 
     std::string ParseCommands(const std::string& command);
 
@@ -55,6 +55,9 @@ public:
 
     std::string choosePivot(std::vector<std::string>&);
     int getRandDepth();
+
+private:
+    void AddDefaultCommands();
 };
 
 #endif
