@@ -36,9 +36,8 @@ int SeeBorg::LoadSettings(void)
 int SeeBorg::SaveSettings(void)
 {
     ofstream ofs(LINES_TXT);
-    set<string>::iterator it;
-    for (it = lines.begin(); it != lines.end(); ++it) {
-        ofs << *it << endl;
+    for (auto &line : lines) {
+        ofs << line << endl;
     }
     ofs.close();
     return true;
@@ -53,9 +52,8 @@ string SeeBorg::Reply(string message)
     splitString(message, curlines, LINE_SEP);
     vector<string> curwords;
 
-    int sz, i;
-    for (sz = curlines.size(), i = 0; i < sz; i++) {
-        tokenizeString(curlines[i], curwords);
+    for (auto &line : lines) {
+        tokenizeString(line, curwords);
     }
 
     if (curwords.empty()) {
@@ -64,13 +62,13 @@ string SeeBorg::Reply(string message)
     // Filter out the words we don't know about
     int known = -1;
     vector<string> index;
-    for (sz = curwords.size(), i = 0; i < sz; i++) {
-        string &x = curwords[i];
-        if (words.find(x) == words.end()) {
+    for (auto &x : curwords) {
+        auto it = words.find(x);
+        if (it == words.end()) {
             continue;
         }
-        int k = words[x].size();
-        if ((known == -1) || (k < known)) {
+        int k = it->second.size();
+        if (known == -1 || k < known) {
             index.clear();
             index.push_back(x);
             known = k;
@@ -143,7 +141,7 @@ string SeeBorg::Reply(string message)
         }
     }
 
-    for (i = 0, sz = sentence.size() - 1; i < sz; i++) {
+    for (int i = 0, sz = sentence.size() - 1; i < sz; i++) {
         replystring += sentence[i];
         replystring += ' ';
     }
@@ -159,9 +157,8 @@ int SeeBorg::Learn(string &body)
     vector<string> curlines;
     splitString(body, curlines, LINE_SEP);
 
-    int sz = curlines.size();
-    for (int i = 0; i < sz; i++) {
-        LearnLine(curlines[i]);
+    for (auto &l : curlines) {
+        LearnLine(l);
     }
 
     return true;
@@ -170,13 +167,7 @@ int SeeBorg::Learn(string &body)
 int SeeBorg::LearnLine(string &line)
 {
     // Ignore quotes
-    if (isdigit(line[0])) {
-        return false;
-    }
-    if (line[0] == '<') {
-        return false;
-    }
-    if (line[0] == '[') {
+    if (isdigit(line[0]) || line[0] == '<' || line[0] == '[') {
         return false;
     }
 
@@ -191,15 +182,16 @@ int SeeBorg::LearnLine(string &line)
 
     int sz = curwords.size();
     for (int i = 0; i < sz; i++) {
-        map<string, word_t>::iterator wit = words.find(curwords[i]);
+        auto &word = curwords[i];
+        map<string, word_t>::iterator wit = words.find(word);
         if (wit == words.end()) {
             word_t cword;
             context_t cxt(lineit, i);
             cword.push_back(cxt);
-            words[curwords[i]] = cword;
+            words[word] = cword;
         } else {
             context_t cxt(lineit, i);
-            ((*wit).second).push_back(cxt);
+            wit->second.push_back(cxt);
         }
         num_contexts++;
     }
@@ -220,9 +212,9 @@ string SeeBorg::ParseCommands(const string& cmd)
 
     string cmd_name = tokens[0].substr(1);
 
-    for (int i = 0; i < cmds.size(); i++) {
-        if (cmd_name == cmds[i].command) {
-            return cmds[i].func(this, tokens);
+    for (auto &cmd : cmds) {
+        if (cmd_name == cmd.command) {
+            return cmd.func(this, tokens);
         }
     }
     return "";
@@ -232,20 +224,13 @@ string SeeBorg::ParseCommands(const string& cmd)
 // ---
 int SeeBorg::FilterMessage(string &message)
 {
-    int n;			// MSVC doesn't like 'for' locality
-    for (n = message.find('\n'); n != message.npos;
-            n = message.find('\n', n)) {
-        message.erase(n, 1);
-    }
-
-    for (n = message.find('\r'); n != message.npos;
-            n = message.find('\r', n)) {
-        message.erase(n, 1);
-    }
-
-    for (n = message.find('\"'); n != message.npos;
-            n = message.find('\"', n)) {
-        message.erase(n, 1);
+    char del[] = {'\n', '\r', '\"'};
+    int n;
+    for (char d : del) {
+        for (n = message.find(d); n != message.npos;
+                n = message.find(d, n)) {
+            message.erase(n, 1);
+        }
     }
 
     for (n = message.find("?"); n != message.npos;
@@ -284,14 +269,10 @@ int SeeBorg::FilterMessage(string &message)
 
 string CMD_Help_f(class SeeBorg *self, const vector<string>& toks)
 {
-    string retstr;
-    retstr = "SeeBorg commands:\n";
-    for (int i = 0; i < self->cmds.size(); i++) {
-        retstr += "!";
-        retstr += self->cmds[i].command;
-        retstr += ": ";
-        retstr += self->cmds[i].description;
-        retstr += "\n";
+    string retstr = "SeeBorg commands:\n";
+    for (auto &cmd : self->cmds) {
+        retstr += "!" + cmd.command + ": ";
+        retstr += cmd.description + "\n";
     }
     return retstr;
 }

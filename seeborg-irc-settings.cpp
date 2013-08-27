@@ -86,9 +86,9 @@ void LoadBotSettings()
                 continue;
             }
             botsettings.channels.clear();
-            for (int i = 0, sz = cursplit.size(); i < sz; i++) {
-                lowerString(cursplit[i]);
-                botsettings.channels.insert(cursplit[i]);
+            for (auto &s : cursplit) {
+                lowerString(s);
+                botsettings.channels.insert(s);
             }
         }
 
@@ -98,9 +98,9 @@ void LoadBotSettings()
                 continue;
             }
             botsettings.owners.clear();
-            for (int i = 0, sz = cursplit.size(); i < sz; i++) {
+            for (auto &s : cursplit) {
                 IrcBotOwner ircbotowner;
-                ircbotowner.nickname = cursplit[i];
+                ircbotowner.nickname = s;
                 botsettings.owners.push_back(ircbotowner);
             }
         }
@@ -111,8 +111,8 @@ void LoadBotSettings()
                 continue;
             }
             botsettings.magicwords.clear();
-            for (int i = 0, sz = cursplit.size(); i < sz; i++) {
-                botsettings.magicwords.push_back(cursplit[i]);
+            for (auto &s : cursplit) {
+                botsettings.magicwords.push_back(s);
             }
         }
 
@@ -168,22 +168,22 @@ void SaveBotSettings()
     fprintf(f, "channels =");
 
     set<string>::iterator it = botsettings.channels.begin();
-    for (; it != botsettings.channels.end(); ++it) {
-        fprintf(f, " %s", (*it).c_str());
+    for (auto &chan : botsettings.channels) {
+        fprintf(f, " %s", chan.c_str());
     }
     fprintf(f, "\n");
 
     fprintf(f, "; Magic word list\n");
     fprintf(f, "magicwords =");
-    for (i = 0, sz = botsettings.magicwords.size(); i < sz; i++) {
-        fprintf(f, " %s", botsettings.magicwords[i].c_str());
+    for (auto &word : botsettings.magicwords) {
+        fprintf(f, " %s", word.c_str());
     }
     fprintf(f, "\n");
 
     fprintf(f, "; Owner list (nicknames)\n");
     fprintf(f, "owners =");
-    for (i = 0, sz = botsettings.owners.size(); i < sz; i++) {
-        fprintf(f, " %s", botsettings.owners[i].nickname.c_str());
+    for (auto &owner : botsettings.owners) {
+        fprintf(f, " %s", owner.nickname.c_str());
     }
     fprintf(f, "\n");
 

@@ -33,11 +33,11 @@ DefExtract(Nick, nick)
 // ---------------------------------------------------------------------------
 static void checkOwners(const string& hostname, const string& nickname)
 {
-    for (int i = 0, sz = botsettings.owners.size(); i < sz; i++) {
-        if (botsettings.owners[i].hostname.empty() &&
-              equalIString(nickname, botsettings.owners[i].nickname)) {
-            botsettings.owners[i].hostname = hostname;
-            cout << "Locked owner '" << nickname << "' to '" << hostname << "'\n";
+    for (auto &owner : botsettings.owners) {
+        if (owner.hostname.empty() && equalIString(nickname, owner.nickname)) {
+            owner.hostname = hostname;
+            cout << "Locked owner '" << nickname << "' to '"
+                 << hostname << "'\n";
             return;
         }
     }
@@ -45,9 +45,9 @@ static void checkOwners(const string& hostname, const string& nickname)
 
 static bool isOwner(const string& hostname, const string& nickname)
 {
-    for (int i = 0, sz = botsettings.owners.size(); i < sz; i++) {
-        if (equalIString(hostname, botsettings.owners[i].hostname) &&
-              equalIString(nickname, botsettings.owners[i].nickname)) {
+    for (auto &owner : botsettings.owners) {
+        if (equalIString(hostname, owner.hostname) &&
+            equalIString(nickname, owner.nickname)) {
             return true;
         }
     }
@@ -80,24 +80,22 @@ static string ProcessMessage(const string &hostname,
 
     // only both to see if we should reply if we're talking
     if (botsettings.speaking) {
-        if (randFloat(0, 99) < botsettings.replyrate) {
+        if (!replying && randFloat(0, 99) < botsettings.replyrate) {
             replying = true;
         }
 
-        if ((!replying) && (botsettings.replyrate_magic > 0)) {
-            int sz = botsettings.magicwords.size();
-            for (int i = 0; i < sz; i++) {
-                if (stdmessage.find(botsettings.magicwords[i]) == string::npos)
+        if (!replying && botsettings.replyrate_magic > 0) {
+            for (auto& word : botsettings.magicwords) {
+                if (stdmessage.find(word) == string::npos)
                     continue;
 
                 if (randFloat(0, 99) < botsettings.replyrate_magic) {
                     replying = true;
-                } else {
                     break;
                 }
             }
         }
-        if ((!replying) && (botsettings.replyrate_mynick > 0)) {
+        if (!replying && botsettings.replyrate_mynick > 0) {
             string nickname = botsettings.nickname;
             lowerString(nickname);
             if (stdmessage.find(nickname) != string::npos &&
@@ -109,7 +107,7 @@ static string ProcessMessage(const string &hostname,
 
     string replystring;
 
-    if ((replying) && (botsettings.speaking)) {
+    if (replying && botsettings.speaking) {
         replystring = gSeeBorg.Reply(stdmessage);
     }
 
@@ -121,17 +119,18 @@ static string ProcessMessage(const string &hostname,
 }
 
 
-static void DoChanTalk(irc_session_t *S, const string& hostname, const string &nickname,
-        const char *Msg, const char *Chan) {
+static void DoChanTalk(irc_session_t *S, const string& hostname,
+        const string &nickname, const char *Msg, const char *Chan) {
     string reply = ProcessMessage(hostname, nickname, Msg);
 
     if (reply.empty()) return;
 
     vector<string> curlines;
     splitString(reply, curlines, "\n");
-    for (int i = 0, sz = curlines.size(); i < sz; i++) {
-        cout << "(" << Chan << ") <" << botsettings.nickname << "> " << reply << "\n";
-        irc_cmd_msg(S, Chan, curlines[i].c_str());
+    for (auto& str : curlines) {
+        cout << "(" << Chan << ") <" << botsettings.nickname << "> "
+             << str << "\n";
+        irc_cmd_msg(S, Chan, str.c_str());
     }
 }
 
@@ -141,9 +140,7 @@ static void ProcOnConnected(irc_session_t *S, const char *event, const char *ori
 {
     cout << "Connected...\n";
 
-    set<string>::iterator it = botsettings.channels.begin();
-    for (; it != botsettings.channels.end(); ++it) {
-        const string &cname = *it;
+    for (auto &cname : botsettings.channels) {
         cout << "Joining " << cname << "...\n";
         irc_cmd_join(S, cname.c_str(), NULL);
     }
@@ -352,8 +349,12 @@ int main(int argc, char *argv[])
     cleanedup = false;
     atexit(cleanup);
 
-    while (!irc_connect(Session, botsettings.server.c_str(), botsettings.serverport, 0, botsettings.nickname.c_str(),
+    cout << "Connecting...\n";
+
+    while (!irc_connect(Session, botsettings.server.c_str(),
+                botsettings.serverport, 0, botsettings.nickname.c_str(),
                 botsettings.username.c_str(), botsettings.realname.c_str())) {
+        cout << "Connected.";
         irc_run(Session);
         cout << "Disconnected.\n";
         sleep(10);

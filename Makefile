@@ -2,7 +2,7 @@ TGTDIR=./
 FNAMEIRC=seeborg-irc
 FNAMELINEIN=seeborg-linein
 
-CFOPT = -O2 -fno-rtti -fno-exceptions
+CFOPT = -O2 -fno-rtti -fno-exceptions -std=c++11
 CFUSER = -Wall -Wextra -Wno-unused-parameter -Wno-sign-compare -Wno-format
 
 SRCS = seeborg.cpp seeutil.cpp
