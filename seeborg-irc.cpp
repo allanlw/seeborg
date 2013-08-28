@@ -245,6 +245,8 @@ static void ProcOnPart(irc_session_t *S, const char *event,
     const char *Chan = params[0];
     const char *Msg = params[1];
 
+    if (nickname == botsettings.nickname) return;
+
     cout << "(" << Chan << ") " << nickname << " (" << hostname
          << ") has left the channel the channel (" << Msg << ")\n";
 

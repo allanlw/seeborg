@@ -216,7 +216,7 @@ static const replacement msg_filters[] = {
 int SeeBorg::FilterMessage(string &message) {
     for (auto &r : msg_filters) {
         for (int n = message.find(r.needle); n != message.npos;
-                n = message.find(r.needle, n)) {
+                n = message.find(r.needle, n+strlen(r.repl))) {
             message.replace(n, strlen(r.needle), r.repl);
         }
     }
