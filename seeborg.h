@@ -59,4 +59,8 @@ private:
     void AddDefaultCommands();
 };
 
+#define SEEBORG_CMD(x) \
+static string CMD_ ## x ##_f(SeeBorg *self, const std::vector<std::string>& toks)
+
+
 #endif

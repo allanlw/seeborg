@@ -4,7 +4,7 @@
 
 using namespace std;
 
-static string CMD_Help_f(class SeeBorg *self, const vector<string>& toks) {
+SEEBORG_CMD(Help) {
     stringstream ss;
     ss << "SeeBorg commands:\n";
     for (auto &cmd : self->cmds) {
@@ -13,18 +13,18 @@ static string CMD_Help_f(class SeeBorg *self, const vector<string>& toks) {
     return ss.str();
 }
 
-static string CMD_Version_f(class SeeBorg *self, const vector<string>& toks) {
+SEEBORG_CMD(Version) {
     return "I am SeeBorg v" SEEBORGVERSIONSTRING
            " by Eugene 'HMage' Bujak";
 }
 
-static string CMD_Words_f(class SeeBorg *self, const vector<string>& toks) {
+SEEBORG_CMD(Words) {
     stringstream ss;
     self->getIKnow(ss);
     return ss.str();
 }
 
-static string CMD_Known_f(class SeeBorg *self, const vector<string>& toks) {
+SEEBORG_CMD(Known) {
     if (toks.size() < 2) {
         return "Not enough parameters, usage: !known <word>";
     }
@@ -42,19 +42,19 @@ static string CMD_Known_f(class SeeBorg *self, const vector<string>& toks) {
     return ss.str();
 }
 
-static string CMD_Contexts_f(class SeeBorg *self, const vector<string>& toks) {
+SEEBORG_CMD(Contexts) {
     return "Not implemented yet";
 }
 
-static string CMD_Unlearn_f(class SeeBorg *self, const vector<string>& toks) {
+SEEBORG_CMD(Unlearn) {
     return "Not implemented yet";
 }
 
-static string CMD_Replace_f(class SeeBorg *self, const vector<string>& toks) {
+SEEBORG_CMD(Replace) {
     return "Not implemented yet";
 }
 
-static string CMD_Quit_f(class SeeBorg *self, const vector<string>& toks) {
+SEEBORG_CMD(Quit) {
     exit(0);
 }
 

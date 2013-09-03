@@ -137,22 +137,27 @@ static void DoChanTalk(irc_session_t *S, const string& hostname,
     }
 }
 
+#define PROC_ON(x) \
+static void ProcOn ## x (irc_session_t *S, const char *event, \
+        const char *origin, const char **params, unsigned int count) {\
+    string nickname = ExtractNick(origin); \
+    string hostname = ExtractHost(origin);
+
+#define PROC_ON_END }
+
+
 // BotNet callback functions
 // ---------------------------------------------------------------------------
-static void ProcOnConnected(irc_session_t *S, const char *event,
-        const char *origin, const char **params, unsigned int count) {
+PROC_ON(Connected)
     cout << "Connected...\n";
 
     for (auto &cname : botsettings.channels) {
         cout << "Joining " << cname << "...\n";
         irc_cmd_join(S, cname.c_str(), NULL);
     }
-}
+PROC_ON_END
 
-static void ProcOnInvite(irc_session_t *S, const char *event,
-        const char *origin, const char **params, unsigned int count) {
-    string nickname = ExtractNick(origin);
-    string hostname = ExtractHost(origin);
+PROC_ON(Invite)
     const char *Chan = params[1];
 
     cout << "Received invitation to " << Chan << " by " << nickname << "\n";
@@ -166,12 +171,9 @@ static void ProcOnInvite(irc_session_t *S, const char *event,
         }
         irc_cmd_join(S, Chan, NULL);
     }
-}
+PROC_ON_END
 
-
-static void ProcOnKick(irc_session_t *S, const char *event,
-        const char *origin, const char **params, unsigned int count) {
-    string nickname = ExtractNick(origin);
+PROC_ON(Kick)
     const char *Chan = params[0];
     const char *Msg = params[2];
     const char *Whom = params[1];
@@ -182,38 +184,26 @@ static void ProcOnKick(irc_session_t *S, const char *event,
     if (nickname == botsettings.nickname) {
         irc_cmd_join(S, Chan, NULL);
     }
-}
+PROC_ON_END
 
-
-static void ProcOnPrivateTalk(irc_session_t *S, const char *event,
-        const char *origin, const char **params, unsigned int count) {
-    string nickname = ExtractNick(origin);
-    string hostname = ExtractHost(origin);
+PROC_ON(PrivateTalk)
     const char *Msg = params[1];
 
     cout << nickname << ": " << Msg << "\n";
 
     DoChanTalk(S, hostname, nickname, Msg, origin, true);
-}
+PROC_ON_END
 
-
-static void ProcOnChannelTalk(irc_session_t *S, const char *event,
-        const char *origin, const char **params, unsigned int count) {
-    string nickname = ExtractNick(origin);
-    string hostname = ExtractHost(origin);
+PROC_ON(ChannelTalk)
     const char *Chan = params[0];
     const char *Msg = params[1];
 
     cout << "(" << Chan << ") <" << nickname << "> " << Msg << "\n";
 
     DoChanTalk(S, hostname, nickname, Msg, Chan);
-}
+PROC_ON_END
 
-
-static void ProcOnAction(irc_session_t *S, const char *event,
-        const char *origin, const char **params, unsigned int count) {
-    string nickname = ExtractNick(origin);
-    string hostname = ExtractHost(origin);
+PROC_ON(Action)
     const char *Msg = params[0];
     const char *Chan = params[1]; //? not specified in documentation
 
@@ -222,26 +212,18 @@ static void ProcOnAction(irc_session_t *S, const char *event,
     cout << "(" << Chan << ") * " << action << "\n";
 
     DoChanTalk(S, hostname, nickname, action.c_str(), Chan);
-}
+PROC_ON_END
 
-
-static void ProcOnJoin(irc_session_t *S, const char *event,
-        const char *origin, const char **params, unsigned int count) {
-    string nickname = ExtractNick(origin);
-    string hostname = ExtractHost(origin);
+PROC_ON(Join)
     const char *Chan = params[0];
 
     cout << "(" << Chan << ") " << nickname << " (" << hostname
          << ") has joined the channel\n";
 
     DoChanTalk(S, hostname, nickname, nickname.c_str(), Chan);
-}
+PROC_ON_END
 
-
-static void ProcOnPart(irc_session_t *S, const char *event,
-        const char *origin, const char **params, unsigned int count) {
-    string nickname = ExtractNick(origin);
-    string hostname = ExtractHost(origin);
+PROC_ON(Part)
     const char *Chan = params[0];
     const char *Msg = params[1];
 
@@ -251,13 +233,9 @@ static void ProcOnPart(irc_session_t *S, const char *event,
          << ") has left the channel the channel (" << Msg << ")\n";
 
     DoChanTalk(S, hostname, nickname, Msg, Chan);
-}
+PROC_ON_END
 
-
-static void ProcOnQuit(irc_session_t *S, const char *event,
-        const char *origin, const char **params, unsigned int count) {
-    string nickname = ExtractNick(origin);
-    string hostname = ExtractHost(origin);
+PROC_ON(Quit)
     const char *Chan = params[0];
     const char *Msg = params[1];
 
@@ -265,7 +243,7 @@ static void ProcOnQuit(irc_session_t *S, const char *event,
          << ") has quit IRC (" << Msg << ")\n";
 
     DoChanTalk(S, hostname, nickname, Msg, Chan);
-}
+PROC_ON_END
 
 // Main Body
 // ---------------------------------------------------------------------------
