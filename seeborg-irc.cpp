@@ -237,7 +237,7 @@ PROC_ON_END
 
 PROC_ON(Quit)
     const char *Chan = params[0];
-    const char *Msg = params[1];
+    const char *Msg = params[1]?params[1]:"";
 
     cout << "" << nickname << " (" << hostname
          << ") has quit IRC (" << Msg << ")\n";
