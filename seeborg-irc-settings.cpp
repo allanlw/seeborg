@@ -78,6 +78,9 @@ void LoadBotSettings() {
         bool owners = (!strcasecmp(cursetting[0].c_str(), "owners"));
         bool magicwords = (!strcasecmp(cursetting[0].c_str(), "magicwords"));
         if (channels || owners || magicwords) {
+            if (channels) {
+                botsettings.channels.clear(); // remove default channels
+            }
             vector<string> cursplit;
             if (!splitString(cursetting[1], cursplit, " ")) {
                 continue;
